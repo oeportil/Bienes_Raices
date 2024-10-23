@@ -12,3 +12,74 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+model User {
+  id        Int       @id @default(autoincrement())
+  name      String
+  email     String    @unique
+  password  String
+  realStates RealState[]
+  bids      Bid[]
+}
+
+model RealState {
+  id          Int               @id @default(autoincrement())
+  name        String
+  description String
+  direction   String
+  phone       String
+  email       String
+  rlst_url    String?
+  price       Decimal
+  status      RealStateStatus   // Puede ser VENTA, ALQUILER o SUBASTA
+  amenitie    Amenitie          @relation(fields: [amenitieId], references: [id], onDelete: Cascade)
+  amenitieId  Int
+  images      RealStateImages[]
+  user        User              @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  user_id     Int
+  auction     Auction?          // Relación opcional para subasta
+}
+
+model Amenitie {
+  id        Int       @id @default(autoincrement())
+  wc        Int
+  dimension Decimal
+  parking   Int
+  rooms     Int
+  gardens   Int
+  realStates RealState[]
+}
+
+model RealStateImages {
+  id          Int       @id @default(autoincrement())
+  img_url     String
+  realState   RealState  @relation(fields: [real_state_id], references: [id], onDelete: Cascade)
+  real_state_id Int
+}
+
+model Auction {
+  id             Int       @id @default(autoincrement())
+  startingPrice  Decimal
+  startDate      DateTime
+  endDate        DateTime
+  bids           Bid[]
+  realState      RealState @relation(fields: [real_state_id], references: [id], onDelete: Cascade)
+  real_state_id  Int @unique
+}
+
+model Bid {
+  id         Int       @id @default(autoincrement())
+  amount     Decimal
+  timestamp  DateTime  @default(now())
+  user       User      @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  user_id    Int
+  auction    Auction   @relation(fields: [auction_id], references: [id], onDelete: Cascade)
+  auction_id Int
+}
+
+enum RealStateStatus {
+  VENTAs
+  ALQUILER
+  SUBASTA
+}
+
