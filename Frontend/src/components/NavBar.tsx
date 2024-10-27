@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
+import Logo from '../assets/logo.png'
 
 const NavBar: React.FC = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -12,26 +13,25 @@ const NavBar: React.FC = () => {
 
   const linkClass = (path: string) =>
     location.pathname === path
-      ? "bg-secondary text-white"
+      ? "text-red-500"
       : "hover:text-accent";
 
   return (
-    <nav className="bg-primary text-white p-4">
+    <nav className="bg-black text-white p-4">
       <div className="container mx-auto flex justify-between items-center">
         {/* Logo or Image on the left */}
         <Link to="/" className="flex items-center">
-          <img src="/logo.png" alt="Logo" className="h-10 w-10 mr-2" />
-          <span className="font-bold text-xl">Box safe</span>
+          <img src={Logo} alt="Logo" className="h-24 w-24 mr-2" />
         </Link>
 
         {/* Links for larger screens */}
         <div className="hidden md:flex space-x-6">
-          <Link to="/" className={`${linkClass("/")} px-3 py-2 rounded`}>
+          <Link to="/" className={`${linkClass("/")} px-3 py-2 rounded hover:text-gray-600`}>
             inicio
           </Link>
           <Link
             to="/propiedades"
-            className={`${linkClass("/propiedades")} px-3 py-2 rounded`}
+            className={`${linkClass("/propiedades")} px-3 py-2 rounded hover:text-gray-600`}
           >
             Propiedades
           </Link>
@@ -50,7 +50,7 @@ const NavBar: React.FC = () => {
                 to="/inicio-sesion"
                 className={`${linkClass(
                   "/inicio-sesion"
-                )} px-3 py-2 bg-white text-primary rounded hover:bg-accent hover:text-white`}
+                )} px-3 py-2 text-white rounded hover:text-gray-600`}
               >
                 Inicio de sesión
               </Link>
@@ -58,7 +58,7 @@ const NavBar: React.FC = () => {
                 to="/registro"
                 className={`${linkClass(
                   "/registro"
-                )} px-3 py-2  bg-white text-primary rounded hover:bg-accent hover:text-white`}
+                )} px-3 py-2  text-white rounded hover:text-gray-600`}
               >
                 Registrarse
               </Link>
@@ -100,7 +100,7 @@ const NavBar: React.FC = () => {
           to="/"
           className={`${linkClass(
             "/"
-          )} block text-center py-2 text-neutral hover:bg-secondary`}
+          )} block text-center py-2 text-neutral`}
         >
           Inicio
         </Link>
@@ -108,7 +108,7 @@ const NavBar: React.FC = () => {
           to="/propiedades"
           className={`${linkClass(
             "/propiedades"
-          )} block text-center py-2 text-neutral hover:bg-secondary`}
+          )} block text-center py-2 text-neutral`}
         >
           Propiedades
         </Link>
@@ -118,7 +118,7 @@ const NavBar: React.FC = () => {
               to="/inicio-sesion"
               className={`${linkClass(
                 "/inicio-sesion"
-              )} block text-center py-2 bg-white text-primary hover:bg-secondary`}
+              )} block text-center py-2 bg-white text-primary`}
             >
               Inicio de sesión
             </Link>
@@ -136,7 +136,7 @@ const NavBar: React.FC = () => {
             to="/perfil"
             className={`${linkClass(
               "/perfil"
-            )} block text-center py-2 text-neutral hover:bg-secondary`}
+            )} block text-center py-2 text-neutral`}
           >
             Perfil
           </Link>

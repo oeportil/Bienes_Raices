@@ -1,15 +1,16 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import Logo from '../assets/logo.png'
 
 const Footer: React.FC = () => {
   return (
-    <footer className="bg-primary text-white py-8">
+    <footer className="bg-black text-white py-8">
       <div className="container mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
         {/* Logo and description */}
         <div className="flex flex-col items-center md:items-start">
-          <img src="/logo.png" alt="Logo" className="h-12 w-12 mb-4" />
+          <img src={Logo} alt="Logo" className="h-24 w-24 mb-4" />
           <p className="text-center md:text-left">
-            Box Safe es una plataforma confiable para encontrar propiedades de
+            Jaffar es una plataforma confiable para encontrar propiedades de
             ensueño. Contáctanos para más información.
           </p>
         </div>
@@ -19,22 +20,22 @@ const Footer: React.FC = () => {
           <h3 className="text-xl font-semibold mb-4">Enlaces Rápidos</h3>
           <ul>
             <li className="mb-2">
-              <Link to="/" className="hover:text-secondary">
+              <Link to="/" className="hover:text-gray-500">
                 Inicio
               </Link>
             </li>
             <li className="mb-2">
-              <Link to="/properties" className="hover:text-secondary">
+              <Link to="/properties" className="hover:text-gray-500">
                 Propiedades
               </Link>
             </li>
             <li className="mb-2">
-              <Link to="/login" className="hover:text-secondary">
+              <Link to="/login" className="hover:text-gray-500">
                 Inicio de Sesión
               </Link>
             </li>
             <li className="mb-2">
-              <Link to="/register" className="hover:text-secondary">
+              <Link to="/register" className="hover:text-gray-500">
                 Registrarse
               </Link>
             </li>
@@ -58,8 +59,8 @@ const Footer: React.FC = () => {
       </div>
 
       {/* Footer Bottom */}
-      <div className="mt-8 border-t border-secondary pt-4 text-center">
-        <p>© 2024 Box Safe. Todos los derechos reservados.</p>
+      <div className="mt-8 border-t border-red-950 pt-4 text-center">
+        <p>© 2024 Jaffar. Todos los derechos reservados.</p>
       </div>
     </footer>
   );
