@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
+import { FaBars } from "react-icons/fa";
 
 const NavBar: React.FC = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -15,6 +16,11 @@ const NavBar: React.FC = () => {
       ? "bg-secondary text-white"
       : "hover:text-accent";
 
+  const buttonClass = (path: string) =>
+    location.pathname === path
+      ? "bg-secondary text-white"
+      : "bg-white text-primary hover:bg-accent hover:text-white";
+
   return (
     <nav className="bg-primary text-white p-4">
       <div className="container mx-auto flex justify-between items-center">
@@ -27,7 +33,7 @@ const NavBar: React.FC = () => {
         {/* Links for larger screens */}
         <div className="hidden md:flex space-x-6">
           <Link to="/" className={`${linkClass("/")} px-3 py-2 rounded`}>
-            inicio
+            Inicio
           </Link>
           <Link
             to="/propiedades"
@@ -36,29 +42,23 @@ const NavBar: React.FC = () => {
             Propiedades
           </Link>
           {isLoggedIn ? (
-            <>
-              <Link
-                to="/perfil"
-                className={`${linkClass("/perfil")} px-3 py-2 rounded`}
-              >
-                Perfil
-              </Link>
-            </>
+            <Link
+              to="/perfil"
+              className={`${linkClass("/perfil")} px-3 py-2 rounded`}
+            >
+              Perfil
+            </Link>
           ) : (
             <>
               <Link
                 to="/inicio-sesion"
-                className={`${linkClass(
-                  "/inicio-sesion"
-                )} px-3 py-2 bg-white text-primary rounded hover:bg-accent hover:text-white`}
+                className={`${buttonClass("/inicio-sesion")} px-3 py-2 rounded`}
               >
                 Inicio de sesión
               </Link>
               <Link
                 to="/registro"
-                className={`${linkClass(
-                  "/registro"
-                )} px-3 py-2  bg-white text-primary rounded hover:bg-accent hover:text-white`}
+                className={`${buttonClass("/registro")} px-3 py-2 rounded`}
               >
                 Registrarse
               </Link>
@@ -72,24 +72,7 @@ const NavBar: React.FC = () => {
             onClick={toggleMobileMenu}
             className="mobile-menu-button focus:outline-none"
           >
-            <svg
-              className="w-6 h-6"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d={
-                  isMobileMenuOpen
-                    ? "M6 18L18 6M6 6l12 12"
-                    : "M4 6h16M4 12h16m-7 6h7"
-                }
-              ></path>
-            </svg>
+            <FaBars className="text-white text-2xl" />
           </button>
         </div>
       </div>
@@ -116,17 +99,17 @@ const NavBar: React.FC = () => {
           <>
             <Link
               to="/inicio-sesion"
-              className={`${linkClass(
+              className={`${buttonClass(
                 "/inicio-sesion"
-              )} block text-center py-2 bg-white text-primary hover:bg-secondary`}
+              )} block text-center py-2 rounded`}
             >
               Inicio de sesión
             </Link>
             <Link
               to="/registro"
-              className={`${linkClass(
+              className={`${buttonClass(
                 "/registro"
-              )} block text-center py-2 bg-white text-primary hover:bg-`}
+              )} block text-center py-2 rounded`}
             >
               Registrarse
             </Link>
