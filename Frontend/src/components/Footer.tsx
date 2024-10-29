@@ -1,5 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import Logo from "../assets/logo.png";
 
 const Footer: React.FC = () => {
   return (
@@ -7,7 +8,7 @@ const Footer: React.FC = () => {
       <div className="container mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
         {/* Logo and description */}
         <div className="flex flex-col items-center md:items-start">
-          <img src="/logo.png" alt="Logo" className="h-12 w-12 mb-4" />
+          <img src={Logo} alt="Logo" className="h-24 w-24 mb-4" />
           <p className="text-center md:text-left">
             Box Safe es una plataforma confiable para encontrar propiedades de
             ensueño. Contáctanos para más información.
@@ -24,17 +25,17 @@ const Footer: React.FC = () => {
               </Link>
             </li>
             <li className="mb-2">
-              <Link to="/properties" className="hover:text-secondary">
+              <Link to="/propiedades" className="hover:text-secondary">
                 Propiedades
               </Link>
             </li>
             <li className="mb-2">
-              <Link to="/login" className="hover:text-secondary">
+              <Link to="/inicio-sesion" className="hover:text-secondary">
                 Inicio de Sesión
               </Link>
             </li>
             <li className="mb-2">
-              <Link to="/register" className="hover:text-secondary">
+              <Link to="/registro" className="hover:text-secondary">
                 Registrarse
               </Link>
             </li>
