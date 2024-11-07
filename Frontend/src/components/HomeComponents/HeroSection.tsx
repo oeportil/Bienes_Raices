@@ -5,6 +5,7 @@ import img2 from "../../assets/img2Hero(compra).png";
 import img3 from "../../assets/img3Hero(subasta).webp";
 
 export default function HeroSection() {
+  //configuraciones del carousel
   const settings = {
     dots: true,
     infinite: true,

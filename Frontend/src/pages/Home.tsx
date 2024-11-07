@@ -1,11 +1,12 @@
 import HeroSection from "../components/HomeComponents/HeroSection";
 import { FaGlobe, FaHandshake, FaRegLightbulb } from "react-icons/fa";
 import team from "../assets/img1About(team).png";
+import PartnersCarousel from "../components/HomeComponents/PartnersCarousel";
 
 export default function Home() {
   return (
     <>
-      {/* Hero Section */}
+      {/* Lo de la imagen y el texto inicial*/}
       <HeroSection />
       {/*About us */}
       <section className="bg-primary text-white py-16 px-6 md:px-12">
@@ -14,8 +15,8 @@ export default function Home() {
           <div className="w-full md:w-1/2 md:pr-8 mb-8 md:mb-0">
             <h2 className="text-4xl font-bold mb-8">¿Por qué Box safe?</h2>
 
-            <div className="flex items-start mb-6 gap-4">
-              <FaGlobe className="text-secondary text-9xl mr-4" />
+            <div className="flex md:items-start items-center flex-col md:flex-row mb-6 gap-4">
+              <FaGlobe className="text-secondary text-7xl md:text-9xl mr-4" />
               <p className="text-lg">
                 Nuestro equipo tiene un conocimiento detallado del mercado
                 inmobiliario local. Entendemos las tendencias, los precios y las
@@ -25,8 +26,8 @@ export default function Home() {
               </p>
             </div>
 
-            <div className="flex items-start mb-6 gap-4">
-              <FaHandshake className="text-secondary text-9xl mr-4" />
+            <div className="flex md:items-start items-center flex-col md:flex-row mb-6 gap-4">
+              <FaHandshake className="text-secondary text-7xl md:text-9xl mr-4" />
               <p className="text-lg">
                 En Box Safe, creemos que la base de toda relación exitosa es la
                 confianza. Por eso, trabajamos con total transparencia en cada
@@ -35,8 +36,8 @@ export default function Home() {
               </p>
             </div>
 
-            <div className="flex items-start mb-6 gap-4">
-              <FaRegLightbulb className="text-secondary text-9xl mr-4" />
+            <div className="flex md:items-start items-center flex-col md:flex-row mb-6 gap-4">
+              <FaRegLightbulb className="text-secondary text-7xl md:text-9xl mr-4" />
               <p className="text-lg">
                 Nos esforzamos por adaptar nuestros servicios a las necesidades
                 individuales de cada cliente, utilizando tecnologías avanzadas
@@ -58,6 +59,11 @@ export default function Home() {
           </div>
         </div>
       </section>
+      {/*Carrusel de partners (si... ya se que partners no significa eso pero pues XD)*/}
+      <h2 className="text-4xl md:text-5xl font-bold my-4 text-primary text-center">
+        Nuestros Socios
+      </h2>
+      <PartnersCarousel />
     </>
   );
 }

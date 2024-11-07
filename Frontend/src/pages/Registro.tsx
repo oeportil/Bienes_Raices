@@ -1,21 +1,26 @@
+import axios from "axios";
 import React, { useState } from "react";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 const Registro: React.FC = () => {
+  //state para los datos de registro
   const [formData, setFormData] = useState({
     username: "",
     email: "",
     password: "",
     repeatPassword: "",
   });
+  //states generales para el componente
   const [showPassword, setShowPassword] = useState(false);
   const [showRepeatPassword, setShowRepeatPassword] = useState(false);
   const [errors, setErrors] = useState("");
 
+  //hanlder para los datos que se guardan en el state de datos de registro ( el state se llama formData )
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  //La funcion que se encarga de la validación de campos vacios
   const validateForm = () => {
     if (
       !formData.username ||
@@ -23,6 +28,7 @@ const Registro: React.FC = () => {
       !formData.password ||
       !formData.repeatPassword
     ) {
+      //Si hay errores se setea el valor en el state para que se muestre la alerta y se interrumpe el flujo
       setErrors("Todos los campos son obligatorios.");
       return false;
     }
@@ -30,15 +36,32 @@ const Registro: React.FC = () => {
       setErrors("Las contraseñas no coinciden.");
       return false;
     }
+    //Si no hay errores se setea el valor en el state para que no se muestre la alerta y se continúa con el flujo
     setErrors("");
     return true;
   };
 
+  //Función que se encarga del registro
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+
     if (validateForm()) {
-      // Aquí podrías enviar los datos a un servidor o hacer alguna acción con formData
-      console.log("Formulario enviado:", formData);
+      //aca saque el repeat password
+      const newUserData = {
+        username: formData.username,
+        email: formData.email,
+        password: formData.password,
+      };
+      //acá ya se envian
+      try {
+        const registUser = async () => {
+          const { data } = await axios.post("", newUserData);
+          console.log(data.message);
+        };
+        registUser();
+      } catch (error) {
+        console.error(error);
+      }
     }
   };
 
@@ -127,7 +150,7 @@ const Registro: React.FC = () => {
 
         <button
           type="submit"
-          className="w-full bg-secondary text-white font-semibold py-3 rounded hover:bg-primary transition duration-300"
+          className="w-full bg-secondary text-white font-semibold py-3 rounded hover:bg-green-600 transition duration-300"
         >
           Registrarse
         </button>
