@@ -48,15 +48,16 @@ const Registro: React.FC = () => {
     if (validateForm()) {
       //aca saque el repeat password
       const newUserData = {
-        username: formData.username,
+        name: formData.username,
         email: formData.email,
         password: formData.password,
       };
       //acá ya se envian
       try {
         const registUser = async () => {
-          const { data } = await axios.post("", newUserData);
-          console.log(data.message);
+          const url = `${import.meta.env.VITE_BACKEND_URL}/users/register`;
+          const { data } = await axios.post(url, newUserData);
+          console.log(data);
         };
         registUser();
       } catch (error) {
