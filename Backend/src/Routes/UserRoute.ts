@@ -1,10 +1,10 @@
 import { Router } from "express";
 import UserController from "../Controllers/UserController";
 
+const router = Router();
 
-const router = Router()
+router.post("/register", UserController.Register);
+router.post("/login", UserController.Login);
+router.patch("/:id", UserController.EditUser);
 
-router.post('/register', UserController.Register);
-router.post('/login', UserController.Login);
-
-export default router
+export default router;
