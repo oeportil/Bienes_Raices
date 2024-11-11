@@ -70,6 +70,25 @@ class UserController {
     };
     return res.status(200).send(user);
   }
+  static async EditUser(req: Request, res: Response) {
+    const { id } = req.params;
+    const { name, email, password }: Partial<User> = req.body;
+    const data: Partial<User> = {};
+
+    if (name) data.name = name;
+    if (email) data.email = email;
+    if (password) {
+      const hashedPassword = await hashPassword(password);
+      data.password = hashedPassword;
+    }
+
+    const updatedUser = await prisma.user.update({
+      where: { id: +id },
+      data,
+    });
+
+    res.json({ message: "User updated successfully", user: updatedUser });
+  }
 }
 
 export default UserController;
