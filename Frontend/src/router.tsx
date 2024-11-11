@@ -5,6 +5,7 @@ import Home from "./pages/Home";
 import States from "./pages/States";
 import Registro from "./pages/Registro";
 import Login from "./pages/Login";
+import Profile from "./pages/Profile";
 
 const router = createBrowserRouter([
   {
@@ -27,6 +28,10 @@ const router = createBrowserRouter([
       {
         path: "registro",
         element: <Registro />,
+      },
+      {
+        path: "perfil",
+        element: <Profile />,
       },
     ],
   },
