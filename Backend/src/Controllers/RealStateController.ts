@@ -153,11 +153,11 @@ class RealStateController {
   }
 
   static async DeleteSingleImage(req: Request, res: Response) {
-    const { id, imageId } = req.params;
+    const { id } = req.params;
 
     try {
       const deletedImage = await prisma.realStateImages.delete({
-        where: { id: parseInt(imageId) },
+        where: { id: parseInt(id) },
       });
 
       if (deletedImage) {
@@ -204,11 +204,11 @@ class RealStateController {
   }
 
   static async ShowImage(req: Request, res: Response) {
-    const { imageId } = req.params;
+    const { id } = req.params;
 
     try {
       const image = await prisma.realStateImages.findUnique({
-        where: { id: parseInt(imageId) },
+        where: { id: parseInt(id) },
       });
 
       if (!image) {
@@ -301,7 +301,7 @@ class RealStateController {
 
     const realState = await prisma.realState.findUnique({
       where: { id: parsedId },
-      include: { amenitie: true, images: true },
+      include: { amenitie: true },
     });
     if (!realState) {
       return res.status(404).json({ message: "Propiedad Inexistente" });
