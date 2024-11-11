@@ -1,14 +1,23 @@
 import React, { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { FaBars } from "react-icons/fa";
+import useUserStore from "../Store/UserStore";
 
 const NavBar: React.FC = () => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const user = useUserStore((state) => state.user); // Solo el estado necesario
+  const setUser = useUserStore((state) => state.setUser); // Solo la función
+
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const location = useLocation(); // Hook para obtener la ruta actual
+  const location = useLocation();
+  const navigate = useNavigate();
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
+  };
+
+  const handleLogout = () => {
+    setUser(null); // Elimina el usuario del estado global
+    navigate("/"); // Redirige al usuario a la página de inicio
   };
 
   const linkClass = (path: string) =>
@@ -24,13 +33,11 @@ const NavBar: React.FC = () => {
   return (
     <nav className="bg-primary text-white p-4">
       <div className="container mx-auto flex justify-between items-center">
-        {/* Logo or Image on the left */}
         <Link to="/" className="flex items-center">
           <img src="/logo.png" alt="Logo" className="h-10 w-10 mr-2" />
-          <span className="font-bold text-xl">Box safe</span>
+          <span className="font-bold text-xl">Box Safe</span>
         </Link>
 
-        {/* Links for larger screens */}
         <div className="hidden md:flex space-x-6">
           <Link to="/" className={`${linkClass("/")} px-3 py-2 rounded`}>
             Inicio
@@ -41,13 +48,21 @@ const NavBar: React.FC = () => {
           >
             Propiedades
           </Link>
-          {isLoggedIn ? (
-            <Link
-              to="/perfil"
-              className={`${linkClass("/perfil")} px-3 py-2 rounded`}
-            >
-              Perfil
-            </Link>
+          {user ? (
+            <>
+              <Link
+                to="/perfil"
+                className={`${linkClass("/perfil")} px-3 py-2 rounded`}
+              >
+                Perfil
+              </Link>
+              <button
+                onClick={handleLogout}
+                className="bg-white text-primary px-3 py-2 rounded hover:bg-red-500 hover:text-white transition duration-200"
+              >
+                Cerrar Sesión
+              </button>
+            </>
           ) : (
             <>
               <Link
@@ -66,7 +81,6 @@ const NavBar: React.FC = () => {
           )}
         </div>
 
-        {/* Mobile Menu Button */}
         <div className="md:hidden flex items-center">
           <button
             onClick={toggleMobileMenu}
@@ -77,7 +91,6 @@ const NavBar: React.FC = () => {
         </div>
       </div>
 
-      {/* Mobile Menu */}
       <div className={`md:hidden ${isMobileMenuOpen ? "block" : "hidden"}`}>
         <Link
           to="/"
@@ -95,7 +108,24 @@ const NavBar: React.FC = () => {
         >
           Propiedades
         </Link>
-        {!isLoggedIn ? (
+        {user ? (
+          <>
+            <Link
+              to="/perfil"
+              className={`${linkClass(
+                "/perfil"
+              )} block text-center py-2 text-neutral hover:bg-secondary`}
+            >
+              Perfil
+            </Link>
+            <button
+              onClick={handleLogout}
+              className="block text-center w-full text-red-500 hover:bg-red-500 hover:text-white py-2 rounded transition duration-200"
+            >
+              Cerrar Sesión
+            </button>
+          </>
+        ) : (
           <>
             <Link
               to="/inicio-sesion"
@@ -114,15 +144,6 @@ const NavBar: React.FC = () => {
               Registrarse
             </Link>
           </>
-        ) : (
-          <Link
-            to="/perfil"
-            className={`${linkClass(
-              "/perfil"
-            )} block text-center py-2 text-neutral hover:bg-secondary`}
-          >
-            Perfil
-          </Link>
         )}
       </div>
     </nav>

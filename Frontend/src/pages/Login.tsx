@@ -1,15 +1,23 @@
 import React, { useState } from "react";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import image from "../assets/loginImage.png";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
+import { toast } from "react-toastify";
+import useUserStore from "../Store/UserStore";
 
 const Login: React.FC = () => {
+  //Estado de zustand
+  const setUser = useUserStore((state) => state.setUser);
+  //Estados del componente
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
     password: "",
   });
   const [error, setError] = useState("");
+
+  const navigate = useNavigate();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -24,8 +32,31 @@ const Login: React.FC = () => {
       return;
     }
 
+    const Login = async () => {
+      try {
+        const url = `${import.meta.env.VITE_BACKEND_URL}/users/login`;
+        const { data } = await axios.post(url, formData);
+        //Metiendo los datos de la db en el estado
+        await setUser(data);
+        toast.success("Bienvenido a BoxSafe");
+        navigate("/");
+      } catch (error) {
+        if (axios.isAxiosError(error) && error.response) {
+          // Accede al mensaje de error del backend
+          const backendMessage = error.response.data.message;
+          toast.error(backendMessage); // Muestra el mensaje en un toast
+        } else {
+          // Si el error no es de Axios o no tiene respuesta, muestra un mensaje genérico
+          toast.error(
+            "Ocurrió un error inesperado. Por favor, inténtalo de nuevo."
+          );
+        }
+        console.error(error);
+      }
+    };
+    Login();
+
     setError("");
-    console.log("Formulario enviado:", formData);
   };
 
   return (
