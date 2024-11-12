@@ -6,6 +6,7 @@ const router = Router();
 router.post("/", RealStateController.Create);
 router.post("/img/:id", RealStateController.AddImages);
 router.get("/", RealStateController.ListRealStates);
+router.get("/list/:id", RealStateController.ListMyStates);
 router.get("/:id", RealStateController.GetRealState);
 router.get("/img/:id", RealStateController.ShowImage);
 router.patch("/:id", RealStateController.EditStates);
