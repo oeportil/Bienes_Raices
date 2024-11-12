@@ -38,19 +38,19 @@ const router = createBrowserRouter([
         element: <Profile />,
       },
       {
-        path: "myproperties",
+        path: "perfil/mis-propiedades",
         element: <CRUDState />,
       },
       {
-        path: "myauctions",
+        path: "perfil/mis-subastas",
         element: <MyAuctions />,
       },
       {
-        path: "auction",
+        path: "subastas",
         element: <Auctions />,
       },
       {
-        path: "auction/:id",
+        path: "subastas/:id",
         element: <Subasta />,
       },
     ],

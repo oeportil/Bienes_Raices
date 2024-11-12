@@ -97,7 +97,7 @@ const Login: React.FC = () => {
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
-                className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:border-secondary"
+                className="w-full p-3 border border-gray-300 text-primary bg-white rounded focus:outline-none focus:border-secondary"
                 placeholder="Ingresa tu correo"
               />
             </div>
@@ -115,7 +115,7 @@ const Login: React.FC = () => {
                 name="password"
                 value={formData.password}
                 onChange={handleChange}
-                className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:border-secondary"
+                className="w-full p-3 border border-gray-300 text-primary bg-white rounded focus:outline-none focus:border-secondary"
                 placeholder="Ingresa tu contraseña"
               />
               <button

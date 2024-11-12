@@ -111,7 +111,7 @@ const Registro: React.FC = () => {
             name="username"
             value={formData.username}
             onChange={handleChange}
-            className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:border-secondary"
+            className="w-full p-3 border border-gray-300 bg-white rounded focus:outline-none focus:border-secondary"
             placeholder="Ingresa tu nombre de usuario"
           />
         </div>
@@ -126,7 +126,7 @@ const Registro: React.FC = () => {
             name="email"
             value={formData.email}
             onChange={handleChange}
-            className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:border-secondary"
+            className="w-full p-3 border border-gray-300 bg-white rounded focus:outline-none focus:border-secondary"
             placeholder="Ingresa tu email"
           />
         </div>
@@ -141,7 +141,7 @@ const Registro: React.FC = () => {
             name="password"
             value={formData.password}
             onChange={handleChange}
-            className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:border-secondary"
+            className="w-full p-3 border border-gray-300 rounded bg-white focus:outline-none focus:border-secondary"
             placeholder="Ingresa tu contraseña"
           />
           <button
@@ -163,7 +163,7 @@ const Registro: React.FC = () => {
             name="repeatPassword"
             value={formData.repeatPassword}
             onChange={handleChange}
-            className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:border-secondary"
+            className="w-full p-3 border border-gray-300 rounded bg-white focus:outline-none focus:border-secondary"
             placeholder="Confirma tu contraseña"
           />
           <button

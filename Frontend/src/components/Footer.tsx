@@ -1,8 +1,12 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import Logo from "../assets/logo.png";
+import useUserStore from "../Store/UserStore"; // Importa tu store de Zustand
 
 const Footer: React.FC = () => {
+  // Obtén el estado del usuario desde Zustand
+  const user = useUserStore((state) => state.user); // Asumiendo que "user" guarda la info del usuario logueado
+
   return (
     <footer className="bg-primary text-white py-8">
       <div className="container mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -29,16 +33,27 @@ const Footer: React.FC = () => {
                 Propiedades
               </Link>
             </li>
-            <li className="mb-2">
-              <Link to="/inicio-sesion" className="hover:text-secondary">
-                Inicio de Sesión
-              </Link>
-            </li>
-            <li className="mb-2">
-              <Link to="/registro" className="hover:text-secondary">
-                Registrarse
-              </Link>
-            </li>
+            {/* Condicionalmente muestra los enlaces dependiendo si el usuario está logueado */}
+            {!user ? (
+              <>
+                <li className="mb-2">
+                  <Link to="/inicio-sesion" className="hover:text-secondary">
+                    Inicio de Sesión
+                  </Link>
+                </li>
+                <li className="mb-2">
+                  <Link to="/registro" className="hover:text-secondary">
+                    Registrarse
+                  </Link>
+                </li>
+              </>
+            ) : (
+              <li className="mb-2">
+                <Link to="/perfil" className="hover:text-secondary">
+                  Perfil
+                </Link>
+              </li>
+            )}
           </ul>
         </div>
 
