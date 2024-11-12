@@ -135,6 +135,93 @@ class AuctionController {
     }
   }
 
+  // Mostrar detalles de todas las subastas del usuario y las 10 mejores pujas (excluyendo duplicadas de un mismo usuario)
+  static async getMyAuctions(req: Request, res: Response) {
+    const { id } = req.params;
+
+    try {
+      const auction = await prisma.auction.findMany({
+        where: { realState: { user_id: parseInt(id) } },
+        include: {
+          realState: true,
+          bids: {
+            include: { user: true },
+            orderBy: { amount: "desc" },
+          },
+        },
+      });
+
+      if (!auction) {
+        return res.status(404).json({ message: "Datos no encontrados" });
+      }
+
+      auction.map((subasta) => {
+        const uniqueBids: { [user_id: number]: boolean } = {};
+        const top10Bids = subasta.bids
+          .filter((bid) => {
+            if (!uniqueBids[bid.user_id]) {
+              uniqueBids[bid.user_id] = true;
+              return true;
+            }
+            return false;
+          })
+          .slice(0, 10);
+        subasta.bids = top10Bids;
+      });
+
+      return res.status(200).json({
+        auction,
+      });
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({
+        message: "Error al obtener los detalles de la subasta",
+      });
+    }
+  }
+
+  // Mostrar detalles de todas las subastas y las 10 mejores pujas (excluyendo duplicadas de un mismo usuario)
+  static async getAuctions(req: Request, res: Response) {
+    try {
+      const auction = await prisma.auction.findMany({
+        include: {
+          realState: true,
+          bids: {
+            include: { user: true },
+            orderBy: { amount: "desc" },
+          },
+        },
+      });
+
+      if (!auction) {
+        return res.status(404).json({ message: "Datos no encontrados" });
+      }
+
+      auction.map((subasta) => {
+        const uniqueBids: { [user_id: number]: boolean } = {};
+        const top10Bids = subasta.bids
+          .filter((bid) => {
+            if (!uniqueBids[bid.user_id]) {
+              uniqueBids[bid.user_id] = true;
+              return true;
+            }
+            return false;
+          })
+          .slice(0, 10);
+        subasta.bids = top10Bids;
+      });
+
+      return res.status(200).json({
+        auction,
+      });
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({
+        message: "Error al obtener los detalles de la subasta",
+      });
+    }
+  }
+
   // Mostrar detalles de la subasta y las 10 mejores pujas (excluyendo duplicadas de un mismo usuario)
   static async getAuctionDetails(req: Request, res: Response) {
     const { id } = req.params;
