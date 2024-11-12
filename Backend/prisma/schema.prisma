@@ -78,7 +78,7 @@ model Bid {
 }
 
 enum RealStateStatus {
-  VENTAs
+  VENTAS
   ALQUILER
   SUBASTA
 }

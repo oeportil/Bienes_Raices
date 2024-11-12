@@ -1,70 +1,47 @@
 import { Request, Response } from "express";
 import { PrismaClient } from "@prisma/client";
-import multer from "multer";
 import fs from "fs";
 import path from "path";
 
 const prisma = new PrismaClient();
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    const { name } = req.body.realstate;
-    const dir = path.join(__dirname, "../../media", name);
-    fs.mkdirSync(dir, { recursive: true });
-    cb(null, dir);
-  },
-  filename: (req, file, cb) => {
-    cb(null, Date.now() + path.extname(file.originalname));
-  },
-});
-
-const upload = multer({
-  storage: storage,
-  limits: { files: 5 },
-}).array("images", 5);
 
 class RealStateController {
   static async Create(req: Request, res: Response) {
-    upload(req, res, async (err) => {
-      if (err) {
-        return res.status(400).json({ message: "Error al subir las imágenes" });
-      }
+    const { realstate, amenitie } = req.body;
+    const files = req.files as Express.Multer.File[];
 
-      const { realstate, amenitie } = req.body;
-      const files = req.files as Express.Multer.File[];
+    if (!realstate || !amenitie || files.length === 0) {
+      return res
+        .status(400)
+        .json({ message: "Proporcione la Información Requerida" });
+    }
 
-      if (!realstate || !amenitie || files.length === 0) {
-        return res
-          .status(400)
-          .json({ message: "Proporcione la Información Requerida" });
-      }
-
-      try {
-        await prisma.$transaction(async (tx) => {
-          const newRealState = await tx.realState.create({
-            data: {
-              ...realstate,
-              amenitie: {
-                create: { ...amenitie },
-              },
-              images: {
-                create: files.map((file) => ({
-                  img_url: path.join("media", realstate.name, file.filename),
-                })),
-              },
+    try {
+      await prisma.$transaction(async (tx) => {
+        const newRealState = await tx.realState.create({
+          data: {
+            ...realstate,
+            amenitie: {
+              create: { ...amenitie },
             },
-          });
-
-          if (!newRealState) throw new Error("Error al crear la propiedad");
+            images: {
+              create: files.map((file) => ({
+                img_url: path.join("media", realstate.name, file.filename),
+              })),
+            },
+          },
         });
 
-        return res.status(200).json({ message: "Propiedad Creada con Éxito" });
-      } catch (error) {
-        console.error(error);
-        return res
-          .status(500)
-          .json({ message: "Error Inesperado, Intente más tarde" });
-      }
-    });
+        if (!newRealState) throw new Error("Error al crear la propiedad");
+      });
+
+      return res.status(200).json({ message: "Propiedad Creada con Éxito" });
+    } catch (error) {
+      console.error(error);
+      return res
+        .status(500)
+        .json({ message: "Error Inesperado, Intente más tarde" });
+    }
   }
 
   static async ListRealStates(req: Request, res: Response) {
@@ -91,31 +68,23 @@ class RealStateController {
       return res.status(400).json({ message: "Valor o Propiedad Invalida" });
     }
 
-    upload(req, res, async (err) => {
-      if (err) {
-        return res.status(400).json({ message: "Error al subir las imágenes" });
-      }
+    const files = req.files as Express.Multer.File[];
 
-      const files = req.files as Express.Multer.File[];
-
-      try {
-        const realstate = await prisma.realState.findUnique({
-          where: { id: parsedId },
-        });
-        await prisma.realStateImages.createMany({
-          data: files.map((file) => ({
-            real_state_id: parsedId,
-            img_url: path.join("media", realstate.name, file.filename),
-          })),
-        });
-        return res
-          .status(200)
-          .json({ message: "Imágenes agregadas con éxito" });
-      } catch (error) {
-        console.error(error);
-        return res.status(500).json({ message: "Error al agregar imágenes" });
-      }
-    });
+    try {
+      const realstate = await prisma.realState.findUnique({
+        where: { id: parsedId },
+      });
+      await prisma.realStateImages.createMany({
+        data: files.map((file) => ({
+          real_state_id: parsedId,
+          img_url: path.join("media", realstate.name, file.filename),
+        })),
+      });
+      return res.status(200).json({ message: "Imágenes agregadas con éxito" });
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({ message: "Error al agregar imágenes" });
+    }
   }
 
   static async EditOnlyImages(req: Request, res: Response) {
@@ -126,48 +95,39 @@ class RealStateController {
       return res.status(400).json({ message: "Valor o Propiedad Invalida" });
     }
 
-    upload(req, res, async (err) => {
-      if (err) {
-        return res.status(400).json({ message: "Error al subir las imágenes" });
-      }
+    const files = req.files as Express.Multer.File[];
 
-      const files = req.files as Express.Multer.File[];
+    try {
+      const realstate = await prisma.realState.findUnique({
+        where: { id: parsedId },
+      });
 
-      try {
-        const realstate = await prisma.realState.findUnique({
-          where: { id: parsedId },
-        });
+      const images = await prisma.realStateImages.findMany({
+        where: { real_state_id: parsedId },
+      });
 
-        const images = await prisma.realStateImages.findMany({
-          where: { real_state_id: parsedId },
-        });
+      images.forEach((image) =>
+        fs.unlinkSync(path.join(__dirname, "../../", image.img_url))
+      );
 
-        images.forEach((image) =>
-          fs.unlinkSync(path.join(__dirname, "../../", image.img_url))
-        );
+      await prisma.realStateImages.deleteMany({
+        where: { real_state_id: parsedId },
+      });
 
-        // Eliminar todas las imágenes existentes
-        await prisma.realStateImages.deleteMany({
-          where: { real_state_id: parsedId },
-        });
-        // Crear nuevas imágenes
-        await prisma.realStateImages.createMany({
-          data: files.map((file) => ({
-            real_state_id: parsedId,
-            img_url: path.join("media", realstate.name, file.filename),
-          })),
-        });
+      await prisma.realStateImages.createMany({
+        data: files.map((file) => ({
+          real_state_id: parsedId,
+          img_url: path.join("media", realstate.name, file.filename),
+        })),
+      });
 
-        return res
-          .status(200)
-          .json({ message: "Imágenes actualizadas con éxito" });
-      } catch (error) {
-        console.error(error);
-        return res
-          .status(500)
-          .json({ message: "Error al actualizar imágenes" });
-      }
-    });
+      return res
+        .status(200)
+        .json({ message: "Imágenes actualizadas con éxito" });
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({ message: "Error al actualizar imágenes" });
+    }
   }
 
   static async DeleteSingleImage(req: Request, res: Response) {
@@ -202,12 +162,10 @@ class RealStateController {
         where: { real_state_id: parsedId },
       });
 
-      // Eliminar archivos de imagen del sistema de archivos
       images.forEach((image) =>
         fs.unlinkSync(path.join(__dirname, "../../", image.img_url))
       );
 
-      // Eliminar registros de imagen de la base de datos
       await prisma.realStateImages.deleteMany({
         where: { real_state_id: parsedId },
       });
@@ -279,12 +237,8 @@ class RealStateController {
       return res
         .status(200)
         .json({ message: "Propiedad Actualizada con Éxito" });
-    } catch (error: unknown) {
-      if (error instanceof Error) {
-        return res.status(500).json({
-          message: error.message || "Error Inesperado, Intente más tarde",
-        });
-      }
+    } catch (error) {
+      console.error(error);
       return res
         .status(500)
         .json({ message: "Error Inesperado, Intente más tarde" });
@@ -327,17 +281,10 @@ class RealStateController {
 
     try {
       await prisma.realState.delete({ where: { id: realState.id } });
-      await prisma.amenitie.delete({ where: { id: realState.amenitieId } });
-      return res.status(200).json({ message: "Propiedad Eliminada con Éxito" });
-    } catch (error: unknown) {
-      if (error instanceof Error) {
-        return res.status(500).json({
-          message: error.message || "Error Inesperado, Intente más tarde",
-        });
-      }
-      return res
-        .status(500)
-        .json({ message: "Error Inesperado, Intente más tarde" });
+      return res.status(200).json({ message: "Propiedad eliminada con éxito" });
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({ message: "Error al eliminar propiedad" });
     }
   }
 }
