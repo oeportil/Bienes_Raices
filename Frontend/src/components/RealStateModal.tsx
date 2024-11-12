@@ -78,8 +78,25 @@ const RealStateFormModal = ({ closeModal }: RealStateModalprops) => {
     }
 
     const data = new FormData();
-    Object.keys(formData).forEach((key) => data.append(key, formData[key]));
-    images.forEach((file) => data.append("images", file));
+    const realstate = {
+      name: formData.name,
+      description: formData.description,
+      direction: formData.direction,
+      phone: formData.phone,
+      email: formData.email,
+      price: formData.price,
+      status: formData.status,
+    };
+    const amenitie = {
+      wc: formData.wc,
+      dimension: formData.dimension,
+      parking: formData.parking,
+      rooms: formData.rooms,
+      gardens: formData.gardens,
+    };
+    data.append("realstate", JSON.stringify(realstate));
+    data.append("amenitie", JSON.stringify(amenitie));
+    images.forEach((image) => data.append("images", image));
 
     console.log("Datos del formulario enviados.");
   };

@@ -48,12 +48,7 @@ class RealStateController {
               },
               images: {
                 create: files.map((file) => ({
-                  img_url: path.join(
-                    "media",
-                    realstate.userName,
-                    realstate.name,
-                    file.filename
-                  ),
+                  img_url: path.join("media", realstate.name, file.filename),
                 })),
               },
             },
@@ -104,10 +99,13 @@ class RealStateController {
       const files = req.files as Express.Multer.File[];
 
       try {
+        const realstate = await prisma.realState.findUnique({
+          where: { id: parsedId },
+        });
         await prisma.realStateImages.createMany({
           data: files.map((file) => ({
             real_state_id: parsedId,
-            img_url: path.join("media", file.filename),
+            img_url: path.join("media", realstate.name, file.filename),
           })),
         });
         return res
@@ -136,6 +134,9 @@ class RealStateController {
       const files = req.files as Express.Multer.File[];
 
       try {
+        const realstate = await prisma.realState.findUnique({
+          where: { id: parsedId },
+        });
         // Eliminar todas las imágenes existentes
         await prisma.realStateImages.deleteMany({
           where: { real_state_id: parsedId },
@@ -145,7 +146,7 @@ class RealStateController {
         await prisma.realStateImages.createMany({
           data: files.map((file) => ({
             real_state_id: parsedId,
-            img_url: path.join("media", file.filename),
+            img_url: path.join("media", realstate.name, file.filename),
           })),
         });
 
