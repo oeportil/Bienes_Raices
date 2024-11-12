@@ -1,6 +1,7 @@
 import express from "express";
 import RealRouter from "./Routes/RealStateRoute";
 import UserRouter from "./Routes/UserRoute";
+import AuctionRouter from "./Routes/AuctionRoute";
 
 import cors from "cors";
 
@@ -13,5 +14,6 @@ server.use(express.json());
 
 server.use("/api/realstates", RealRouter);
 server.use("/api/users", UserRouter);
+server.use("/api/auction", AuctionRouter);
 
 export default server;

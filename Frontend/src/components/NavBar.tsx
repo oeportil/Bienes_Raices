@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { FaBars } from "react-icons/fa";
 import useUserStore from "../Store/UserStore";
+import Logo from "../assets/logo.png";
 
 const NavBar: React.FC = () => {
   const user = useUserStore((state) => state.user); // Solo el estado necesario
@@ -34,7 +35,7 @@ const NavBar: React.FC = () => {
     <nav className="bg-primary text-white p-4">
       <div className="container mx-auto flex justify-between items-center">
         <Link to="/" className="flex items-center">
-          <img src="/logo.png" alt="Logo" className="h-10 w-10 mr-2" />
+          <img src={Logo} alt="Logo" className="h-10 w-10 mr-2" />
           <span className="font-bold text-xl">Box Safe</span>
         </Link>
 

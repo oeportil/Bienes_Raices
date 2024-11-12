@@ -6,6 +6,10 @@ import States from "./pages/States";
 import Registro from "./pages/Registro";
 import Login from "./pages/Login";
 import Profile from "./pages/Profile";
+import CRUDState from "./pages/User/CRUDState";
+import MyAuctions from "./pages/User/MyAuctions";
+import Auctions from "./pages/User/Auctions";
+import Subasta from "./pages/User/Subasta";
 
 const router = createBrowserRouter([
   {
@@ -32,6 +36,22 @@ const router = createBrowserRouter([
       {
         path: "perfil",
         element: <Profile />,
+      },
+      {
+        path: "myproperties",
+        element: <CRUDState />,
+      },
+      {
+        path: "myauctions",
+        element: <MyAuctions />,
+      },
+      {
+        path: "auction",
+        element: <Auctions />,
+      },
+      {
+        path: "auction/:id",
+        element: <Subasta />,
       },
     ],
   },
