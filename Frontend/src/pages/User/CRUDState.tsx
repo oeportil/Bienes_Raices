@@ -1,86 +1,34 @@
-import React, { useEffect, useState } from "react";
-import axios from "axios";
-import { toast } from "react-toastify";
-import Slider from "react-slick";
-import PropertyCard from "../../components/PropertyCard";
 import RealStateModal from "../../components/RealStateModal";
 import useUserStore from "../../Store/UserStore";
+import { FaPlusCircle } from "react-icons/fa";
+import CarouselOfUserEstates from "../../components/EstatesComponents/CarouselOfUserEstates";
+import { useState } from "react";
 
 const RealStateCRUD = () => {
   const user = useUserStore((state: any) => state.user);
-  const [realStates, setRealStates] = useState([]);
-  const [selectedRealState, setSelectedRealState] = useState(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedProperty, setSelectedProperty] = useState<RealState | null>(
-    null
-  );
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
-  useEffect(() => {
-    if (user) fetchProperties();
-  }, [user]);
-
-  const fetchProperties = async () => {
-    try {
-      const response = await fetch(
-        `${import.meta.env.VITE_BACKEND_URL}/realstates/list/${user?.id}`
-      );
-      const data = await response.json();
-      setRealStates(data);
-    } catch (error) {
-      toast.error("Error al cargar propiedades");
-    }
-  };
-
-  const handleAdd = () => {
-    setSelectedRealState(null);
-    setIsModalOpen(true);
-  };
-
-  const handleEdit = (realState) => {
-    setSelectedRealState(realState);
-    setIsModalOpen(true);
-  };
-
-  const handleDelete = async (id) => {
-    if (window.confirm("¿Está seguro de eliminar esta propiedad?")) {
-      try {
-        await axios.delete(
-          `${import.meta.env.VITE_BACKEND_URL}/realstates/${id}`
-        );
-        fetchProperties();
-      } catch (error) {
-        console.error("Error al eliminar la propiedad:", error);
-      }
-    }
-  };
-
-  const handleSave = () => {
+  //esto maneja el cierre de la modal
+  const handleCloseModal = () => {
     setIsModalOpen(false);
-    fetchProperties();
   };
-
   return (
-    <div className=" h-96">
-      <h1>Gestión de Propiedades</h1>
-      <button onClick={handleAdd}>Nueva Propiedad</button>
-      <Slider {...{ slidesToShow: 3, infinite: false }}>
-        {realStates.map((property) => (
-          <PropertyCard
-            key={property.id}
-            property={property}
-            onEdit={handleEdit}
-            onDelete={handleDelete}
-          />
-        ))}
-      </Slider>
+    <main>
+      <h1 className="text-center text-4xl text-primary md:text-5xl font-bold my-4">
+        Gestión de Propiedades
+      </h1>
 
-      <RealStateModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        onSave={handleSave}
-        initialData={selectedRealState || {}}
-      />
-    </div>
+      <button
+        onClick={() => setIsModalOpen(true)}
+        className="bg-secondary mb-5 text-white font-bold flex gap-3 text-center p-4 rounded-lg shadow-sm ml-10 hover:bg-green-500"
+      >
+        Nueva Propiedad
+        <FaPlusCircle className="text-white text-xl" />
+      </button>
+
+      <CarouselOfUserEstates />
+      {isModalOpen && <RealStateModal closeModal={handleCloseModal} />}
+    </main>
   );
 };
 
