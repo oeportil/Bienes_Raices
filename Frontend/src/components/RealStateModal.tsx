@@ -1,4 +1,4 @@
-import React, { useState, ChangeEvent, FormEvent } from "react";
+import { useState, ChangeEvent, FormEvent } from "react";
 import {
   FaWindowClose,
   FaBath,
@@ -8,23 +8,25 @@ import {
   FaTree,
 } from "react-icons/fa";
 import Slider from "react-slick";
+import useUserStore from "../Store/UserStore";
+import axios from "axios";
+import { RealStateMessage } from "../types";
+import { toast } from "react-toastify";
 
-type RealStateModalprops = {
+type RealStateModalProps = {
   closeModal: () => void;
 };
 
-const RealStateFormModal = ({ closeModal }: RealStateModalprops) => {
+const RealStateFormModal = ({ closeModal }: RealStateModalProps) => {
+  const user = useUserStore((state: any) => state.user);
   const [formData, setFormData] = useState({
     name: "",
     description: "",
     direction: "",
     phone: "",
     email: "",
-    rlst_url: "",
     price: "",
     status: "",
-    amenitieId: "",
-    user_id: "",
     wc: "",
     dimension: "",
     parking: "",
@@ -43,7 +45,7 @@ const RealStateFormModal = ({ closeModal }: RealStateModalprops) => {
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
     if (files.length + images.length > 5) {
-      alert("Debe tener un máximo de 5 imágenes.");
+      toast.warn("Solo se permite un máximo de 5 imágenes.");
       return;
     }
     setImages((prevImages) => [...prevImages, ...files]);
@@ -54,51 +56,56 @@ const RealStateFormModal = ({ closeModal }: RealStateModalprops) => {
   };
 
   const handleRemoveImage = (index: number) => {
-    const newImages = [...images];
-    const newPreviews = [...previews];
-    newImages.splice(index, 1);
-    newPreviews.splice(index, 1);
-    setImages(newImages);
-    setPreviews(newPreviews);
+    setImages((prev) => prev.filter((_, i) => i !== index));
+    setPreviews((prev) => prev.filter((_, i) => i !== index));
   };
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
     // Validación de campos obligatorios
-    for (const key in formData) {
-      if (!formData[key as keyof typeof formData]) {
-        alert("Todos los campos deben estar completos.");
-        return;
-      }
+    if (Object.values(formData).some((field) => !field)) {
+      toast.warn("Todos los campos deben estar completos.");
+      return;
     }
     if (images.length === 0) {
-      alert("Debe subir al menos una imagen.");
+      toast.warn("Debe subir al menos una imagen.");
       return;
     }
 
-    const data = new FormData();
-    const realstate = {
-      name: formData.name,
-      description: formData.description,
-      direction: formData.direction,
-      phone: formData.phone,
-      email: formData.email,
-      price: formData.price,
-      status: formData.status,
-    };
-    const amenitie = {
-      wc: formData.wc,
-      dimension: formData.dimension,
-      parking: formData.parking,
-      rooms: formData.rooms,
-      gardens: formData.gardens,
-    };
-    data.append("realstate", JSON.stringify(realstate));
-    data.append("amenitie", JSON.stringify(amenitie));
-    images.forEach((image) => data.append("images", image));
+    const dataToSend = new FormData();
+    dataToSend.append(
+      "realstate",
+      JSON.stringify({
+        user_id: user.id,
+        ...formData,
+        price: parseFloat(formData.price),
+      })
+    );
+    dataToSend.append(
+      "amenitie",
+      JSON.stringify({
+        wc: parseInt(formData.wc),
+        dimension: parseFloat(formData.dimension),
+        parking: parseInt(formData.parking),
+        rooms: parseInt(formData.rooms),
+        gardens: parseInt(formData.gardens),
+      })
+    );
+    images.forEach((image) => dataToSend.append("images", image));
 
-    console.log("Datos del formulario enviados.");
+    try {
+      const url = `${import.meta.env.VITE_BACKEND_URL}/realstates`;
+      const { data } = await axios.post<RealStateMessage>(url, dataToSend);
+      toast.success(data.message);
+      closeModal();
+    } catch (error) {
+      const message =
+        axios.isAxiosError(error) && error.response
+          ? error.response.data.message
+          : "Ocurrió un error inesperado. Por favor, inténtalo de nuevo.";
+      toast.error(message);
+    }
   };
 
   const settings = {
@@ -125,47 +132,17 @@ const RealStateFormModal = ({ closeModal }: RealStateModalprops) => {
           </h2>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <input
-              type="text"
-              name="name"
-              placeholder="Nombre de la propiedad"
-              className="input input-bordered w-full bg-white"
-              onChange={handleInputChange}
-              required
-            />
-            <input
-              type="text"
-              name="direction"
-              placeholder="Dirección"
-              className="input input-bordered w-full bg-white"
-              onChange={handleInputChange}
-              required
-            />
-            <input
-              type="text"
-              name="phone"
-              placeholder="Teléfono"
-              className="input input-bordered w-full bg-white"
-              onChange={handleInputChange}
-              required
-            />
-            <input
-              type="email"
-              name="email"
-              placeholder="Email"
-              className="input input-bordered w-full bg-white"
-              onChange={handleInputChange}
-              required
-            />
-            <input
-              type="number"
-              name="price"
-              placeholder="Precio"
-              className="input input-bordered w-full bg-white"
-              step="0.01"
-              onChange={handleInputChange}
-              required
-            />
+            {["name", "direction", "phone", "email", "price"].map((field) => (
+              <input
+                key={field}
+                type={field === "price" ? "number" : "text"}
+                name={field}
+                placeholder={field.charAt(0).toUpperCase() + field.slice(1)}
+                className="input input-bordered w-full bg-white"
+                onChange={handleInputChange}
+                required
+              />
+            ))}
             <select
               name="status"
               className="select select-bordered w-full bg-white"
@@ -177,26 +154,10 @@ const RealStateFormModal = ({ closeModal }: RealStateModalprops) => {
               <option value="ALQUILER">Alquiler</option>
               <option value="SUBASTA">Subasta</option>
             </select>
-            <input
-              type="number"
-              name="amenitieId"
-              placeholder="ID de Amenitie"
-              className="input input-bordered w-full bg-white"
-              onChange={handleInputChange}
-              required
-            />
-            <input
-              type="number"
-              name="user_id"
-              placeholder="ID del Usuario"
-              className="input input-bordered w-full bg-white"
-              onChange={handleInputChange}
-              required
-            />
             <textarea
               name="description"
               placeholder="Descripción"
-              className="textarea textarea-bordered w-full bg-white"
+              className="textarea textarea-bordered w-full max-h-20 min-h-14 bg-white"
               onChange={handleInputChange}
               required
             ></textarea>
@@ -205,62 +166,29 @@ const RealStateFormModal = ({ closeModal }: RealStateModalprops) => {
           <div className="mt-4">
             <label className="label font-semibold">Amenidades</label>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="flex items-center gap-2">
-                <FaBath className="text-lg" />
-                <input
-                  type="number"
-                  name="wc"
-                  placeholder="Número de baños"
-                  className="input input-bordered w-full bg-white"
-                  onChange={handleInputChange}
-                  required
-                />
-              </div>
-              <div className="flex items-center gap-2">
-                <FaRulerCombined className="text-lg" />
-                <input
-                  type="number"
-                  name="dimension"
-                  placeholder="Dimensión (m²)"
-                  className="input input-bordered w-full bg-white"
-                  step="0.01"
-                  onChange={handleInputChange}
-                  required
-                />
-              </div>
-              <div className="flex items-center gap-2">
-                <FaParking className="text-lg" />
-                <input
-                  type="number"
-                  name="parking"
-                  placeholder="Número de parqueos"
-                  className="input input-bordered w-full bg-white"
-                  onChange={handleInputChange}
-                  required
-                />
-              </div>
-              <div className="flex items-center gap-2">
-                <FaBed className="text-lg" />
-                <input
-                  type="number"
-                  name="rooms"
-                  placeholder="Número de habitaciones"
-                  className="input input-bordered w-full bg-white"
-                  onChange={handleInputChange}
-                  required
-                />
-              </div>
-              <div className="flex items-center gap-2">
-                <FaTree className="text-lg" />
-                <input
-                  type="number"
-                  name="gardens"
-                  placeholder="Número de jardines"
-                  className="input input-bordered w-full bg-white"
-                  onChange={handleInputChange}
-                  required
-                />
-              </div>
+              {[
+                { name: "wc", icon: FaBath, placeholder: "Número de baños" },
+                {
+                  name: "dimension",
+                  icon: FaRulerCombined,
+                  placeholder: "Dimensión (m²)",
+                },
+                { name: "parking", icon: FaParking, placeholder: "Parqueos" },
+                { name: "rooms", icon: FaBed, placeholder: "Habitaciones" },
+                { name: "gardens", icon: FaTree, placeholder: "Jardines" },
+              ].map(({ name, icon: Icon, placeholder }) => (
+                <div key={name} className="flex items-center gap-2">
+                  <Icon className="text-lg" />
+                  <input
+                    type="number"
+                    name={name}
+                    placeholder={placeholder}
+                    className="input input-bordered w-full bg-white"
+                    onChange={handleInputChange}
+                    required
+                  />
+                </div>
+              ))}
             </div>
           </div>
 
@@ -281,7 +209,7 @@ const RealStateFormModal = ({ closeModal }: RealStateModalprops) => {
                     <img
                       src={preview}
                       alt={`Preview ${index}`}
-                      className="w-full h-auto"
+                      className="w-auto h-96"
                     />
                     <button
                       type="button"
@@ -296,7 +224,10 @@ const RealStateFormModal = ({ closeModal }: RealStateModalprops) => {
             )}
           </div>
 
-          <button type="submit" className="btn btn-primary w-full mt-6">
+          <button
+            type="submit"
+            className="p-2 rounded-sm font-bold bg-accent hover:bg-yellow-500 w-full mt-6"
+          >
             Enviar
           </button>
         </form>

@@ -8,3 +8,6 @@ export type UserData = {
   id: number;
   name: string;
 };
+export type RealStateMessage = {
+  message: string;
+};
