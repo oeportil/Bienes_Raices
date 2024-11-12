@@ -49,20 +49,60 @@ const NavBar: React.FC = () => {
           >
             Propiedades
           </Link>
+          <Link
+            to="/subastas"
+            className={`${linkClass("/subastas")} px-3 py-2 rounded`}
+          >
+            Subastas
+          </Link>
           {user ? (
             <>
-              <Link
-                to="/perfil"
-                className={`${linkClass("/perfil")} px-3 py-2 rounded`}
-              >
-                Perfil
-              </Link>
-              <button
-                onClick={handleLogout}
-                className="bg-white text-primary px-3 py-2 rounded hover:bg-red-500 hover:text-white transition duration-200"
-              >
-                Cerrar Sesión
-              </button>
+              <details className="dropdown dropdown-end ">
+                <summary
+                  role="button"
+                  className="btn m-1 bg-white text-secondary hover:bg-yellow-500 hover:text-white "
+                >
+                  Perfil
+                </summary>
+                <ul className="menu dropdown-content bg-white text-primary rounded-box z-[10] w-52 p-2 shadow">
+                  <li>
+                    <Link
+                      to="/perfil"
+                      className={`${linkClass("/perfil")} px-3 py-2 rounded`}
+                    >
+                      Mis datos
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      to="/perfil/mis-propiedades"
+                      className={`${linkClass(
+                        "/perfil/mis-propiedades"
+                      )} px-3 py-2 rounded`}
+                    >
+                      Mis propiedades
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      to="/perfil/mis-subastas"
+                      className={`${linkClass(
+                        "/perfil/mis-subastas"
+                      )} px-3 py-2 rounded`}
+                    >
+                      Mis Subastas
+                    </Link>
+                  </li>
+                  <li>
+                    <button
+                      onClick={handleLogout}
+                      className="bg-white text-primary px-3 py-2 rounded hover:bg-red-500 hover:text-white transition duration-200"
+                    >
+                      Cerrar Sesión
+                    </button>
+                  </li>
+                </ul>
+              </details>
             </>
           ) : (
             <>
@@ -109,8 +149,16 @@ const NavBar: React.FC = () => {
         >
           Propiedades
         </Link>
+        <Link
+          to="/subastas"
+          className={`${linkClass(
+            "/subastas"
+          )} block text-center py-2 text-neutral hover:bg-secondary`}
+        >
+          Subastas
+        </Link>
         {user ? (
-          <>
+          <div>
             <Link
               to="/perfil"
               className={`${linkClass(
@@ -125,7 +173,7 @@ const NavBar: React.FC = () => {
             >
               Cerrar Sesión
             </button>
-          </>
+          </div>
         ) : (
           <>
             <Link
