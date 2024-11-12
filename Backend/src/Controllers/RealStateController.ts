@@ -79,6 +79,15 @@ class RealStateController {
     return res.json(realStates);
   }
 
+  static async ListMyStates(req: Request, res: Response) {
+    const { id } = req.params;
+    const realStates = await prisma.realState.findMany({
+      where: { user_id: +id },
+      include: { amenitie: true, images: true },
+    });
+    return res.json(realStates);
+  }
+
   static async AddImages(req: Request, res: Response) {
     const { id } = req.params;
     const parsedId = parseInt(id);

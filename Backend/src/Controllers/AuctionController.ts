@@ -169,9 +169,7 @@ class AuctionController {
         subasta.bids = top10Bids;
       });
 
-      return res.status(200).json({
-        auction,
-      });
+      return res.status(200).json(auction);
     } catch (error) {
       console.error(error);
       return res.status(500).json({
@@ -211,9 +209,7 @@ class AuctionController {
         subasta.bids = top10Bids;
       });
 
-      return res.status(200).json({
-        auction,
-      });
+      return res.status(200).json(auction);
     } catch (error) {
       console.error(error);
       return res.status(500).json({
