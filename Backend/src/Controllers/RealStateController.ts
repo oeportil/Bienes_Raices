@@ -137,11 +137,19 @@ class RealStateController {
         const realstate = await prisma.realState.findUnique({
           where: { id: parsedId },
         });
+
+        const images = await prisma.realStateImages.findMany({
+          where: { real_state_id: parsedId },
+        });
+
+        images.forEach((image) =>
+          fs.unlinkSync(path.join(__dirname, "../../", image.img_url))
+        );
+
         // Eliminar todas las imágenes existentes
         await prisma.realStateImages.deleteMany({
           where: { real_state_id: parsedId },
         });
-
         // Crear nuevas imágenes
         await prisma.realStateImages.createMany({
           data: files.map((file) => ({
@@ -319,6 +327,7 @@ class RealStateController {
 
     try {
       await prisma.realState.delete({ where: { id: realState.id } });
+      await prisma.amenitie.delete({ where: { id: realState.amenitieId } });
       return res.status(200).json({ message: "Propiedad Eliminada con Éxito" });
     } catch (error: unknown) {
       if (error instanceof Error) {
