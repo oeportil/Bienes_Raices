@@ -78,10 +78,16 @@ const RealStateFormModal = ({ closeModal }: RealStateModalProps) => {
       "realstate",
       JSON.stringify({
         user_id: user.id,
-        ...formData,
+        name: formData.name,
+        description: formData.description,
+        direction: formData.direction,
+        phone: formData.phone,
+        email: formData.email,
         price: parseFloat(formData.price),
+        status: formData.status,
       })
     );
+    console.log(dataToSend);
     dataToSend.append(
       "amenitie",
       JSON.stringify({

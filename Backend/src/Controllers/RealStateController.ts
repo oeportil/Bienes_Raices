@@ -7,9 +7,13 @@ const prisma = new PrismaClient();
 
 class RealStateController {
   static async Create(req: Request, res: Response) {
-    const { realstate, amenitie } = req.body;
-    const files = req.files as Express.Multer.File[];
+    const realstate = JSON.parse(req.body.realstate);
+    const amenitie = JSON.parse(req.body.amenitie);
 
+    const files = req.files as Express.Multer.File[];
+    console.log(typeof realstate);
+    console.log(amenitie);
+    console.log(realstate.name);
     if (!realstate || !amenitie || files.length === 0) {
       return res
         .status(400)
@@ -20,21 +24,34 @@ class RealStateController {
       await prisma.$transaction(async (tx) => {
         const newRealState = await tx.realState.create({
           data: {
-            ...realstate,
+            name: realstate.name,
+            description: realstate.description,
+            direction: realstate.direction,
+            phone: realstate.phone,
+            email: realstate.email,
+            price: realstate.price,
+            status: realstate.status,
+            user: {
+              connect: { id: realstate.user_id },
+            },
             amenitie: {
-              create: { ...amenitie },
+              create: {
+                wc: amenitie.wc,
+                dimension: amenitie.dimension,
+                parking: amenitie.parking,
+                rooms: amenitie.rooms,
+                gardens: amenitie.gardens,
+              },
             },
             images: {
               create: files.map((file) => ({
-                img_url: path.join("media", realstate.name, file.filename),
+                img_url: path.join("media", file.filename),
               })),
             },
           },
         });
-
         if (!newRealState) throw new Error("Error al crear la propiedad");
       });
-
       return res.status(200).json({ message: "Propiedad Creada con Éxito" });
     } catch (error) {
       console.error(error);
@@ -77,7 +94,7 @@ class RealStateController {
       await prisma.realStateImages.createMany({
         data: files.map((file) => ({
           real_state_id: parsedId,
-          img_url: path.join("media", realstate.name, file.filename),
+          img_url: path.join("media", file.filename),
         })),
       });
       return res.status(200).json({ message: "Imágenes agregadas con éxito" });
@@ -117,7 +134,7 @@ class RealStateController {
       await prisma.realStateImages.createMany({
         data: files.map((file) => ({
           real_state_id: parsedId,
-          img_url: path.join("media", realstate.name, file.filename),
+          img_url: path.join("media", file.filename),
         })),
       });
 

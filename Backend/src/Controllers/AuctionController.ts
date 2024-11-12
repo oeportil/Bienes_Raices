@@ -145,7 +145,9 @@ class AuctionController {
         include: {
           realState: true,
           bids: {
-            include: { user: true },
+            include: {
+              user: { select: { id: true, name: true, email: true } },
+            },
             orderBy: { amount: "desc" },
           },
         },
@@ -185,7 +187,9 @@ class AuctionController {
         include: {
           realState: true,
           bids: {
-            include: { user: true },
+            include: {
+              user: { select: { id: true, name: true, email: true } },
+            },
             orderBy: { amount: "desc" },
           },
         },
@@ -228,7 +232,9 @@ class AuctionController {
         include: {
           realState: true,
           bids: {
-            include: { user: true },
+            include: {
+              user: { select: { id: true, name: true, email: true } },
+            },
             orderBy: { amount: "desc" },
           },
         },
@@ -270,7 +276,9 @@ class AuctionController {
       // Obtener las pujas de la subasta, ordenadas de mayor a menor
       const bids = await prisma.bid.findMany({
         where: { id: parseInt(id) },
-        include: { user: true },
+        include: {
+          user: { select: { id: true, name: true, email: true } },
+        },
         orderBy: { amount: "desc" },
       });
 
