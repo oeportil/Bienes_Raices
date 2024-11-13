@@ -1,6 +1,7 @@
 import { Outlet } from "react-router-dom";
 import NavBar from "./components/NavBar";
 import Footer from "./components/Footer";
+import TawktoChat from "./TawktoChat";
 
 export default function Layout() {
   return (
@@ -10,6 +11,7 @@ export default function Layout() {
       <Outlet />
       <div className="flex-grow"></div>
       <Footer />
+      <TawktoChat />
     </div>
   );
 }
