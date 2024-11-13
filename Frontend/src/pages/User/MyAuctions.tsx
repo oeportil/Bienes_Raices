@@ -85,7 +85,7 @@ export default function MyAuctions() {
       <div className="my-8 mx-32">
         <h2 className="text-2xl font-bold text-black">Mis Subastas</h2>
         <br />
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
           {userAuctions.map((auction) => (
             <div
               key={auction.id}
@@ -104,19 +104,14 @@ export default function MyAuctions() {
                 <p>
                   Fecha de fin: {new Date(auction.endDate).toLocaleDateString()}
                 </p>
-                {canEditAuction(auction.endDate) && (
+                {canEditAuction(auction.startDate) && (
                   <button
                     onClick={() => {
                       handleEditAuction(auction.id);
                     }}
-                    className="bg-blue-500 text-white p-2 rounded mt-2"
+                    className="bg-primary text-white p-2 rounded mt-2 me-2 px-4"
                   >
                     Editar
-                  </button>
-                )}
-                {canDeleteAuction(auction.endDate) && (
-                  <button className="bg-red-500 text-white p-2 rounded mt-2">
-                    Eliminar
                   </button>
                 )}
               </div>
