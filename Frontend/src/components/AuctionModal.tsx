@@ -1,0 +1,265 @@
+import { useState, ChangeEvent, FormEvent, useEffect } from "react";
+import { parseISO, set, isBefore, isAfter, isToday } from "date-fns";
+import {
+  FaWindowClose,
+  FaBath,
+  FaRulerCombined,
+  FaParking,
+  FaBed,
+  FaTree,
+} from "react-icons/fa";
+import useUserStore from "../Store/UserStore";
+import axios from "axios";
+import { toast } from "react-toastify";
+
+type RealStateModalProps = {
+  closeModal: () => void;
+  editmode: boolean;
+};
+
+const AuctionModal = ({ closeModal, editmode }: RealStateModalProps) => {
+  const user = useUserStore((state: any) => state.user);
+  const [formData, setFormData] = useState({
+    startingPrice: "",
+    startDate: "",
+    startTime: "",
+    endDate: "",
+    endTime: "",
+  });
+  const [realstates, setRealStates] = useState(Array<any>);
+  const handleInputChange = (
+    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  useEffect(() => {
+    async function GetRealStates() {
+      const url = `${import.meta.env.VITE_BACKEND_URL}/auction/realstate/${
+        user.id
+      }`;
+      const { data } = await axios.get(url);
+      console.log(data);
+      setRealStates(data);
+    }
+    if (!editmode) {
+      GetRealStates();
+    }
+  }, []);
+  function handleEdit() {}
+  function handleSubmit(realStateId: number) {
+    const { startingPrice, startDate, startTime, endDate, endTime } = formData;
+
+    // Validación de campos obligatorios
+    if (Object.values(formData).some((field) => !field)) {
+      toast.warn("Todos los campos deben estar completos.");
+      return;
+    }
+
+    // Combina la fecha y hora de inicio usando date-fns
+    const startDateTime = set(parseISO(startDate), {
+      hours: parseInt(startTime.split(":")[0]),
+      minutes: parseInt(startTime.split(":")[1]),
+      seconds: 0,
+    });
+
+    // Combina la fecha y hora de fin usando date-fns
+    const endDateTime = set(parseISO(endDate), {
+      hours: parseInt(endTime.split(":")[0]),
+      minutes: parseInt(endTime.split(":")[1]),
+      seconds: 0,
+    });
+
+    // Validación de fechas
+    const now = new Date();
+    if (isBefore(startDateTime, now) || isBefore(endDateTime, now)) {
+      toast.error("Las fechas no pueden ser en el pasado.");
+      return;
+    }
+    if (isAfter(startDateTime, endDateTime)) {
+      toast.error(
+        "La fecha y hora de inicio no pueden ser mayores que la de fin."
+      );
+      return;
+    }
+
+    axios
+      .post(`${import.meta.env.VITE_BACKEND_URL}/auction`, {
+        realStateId,
+        startingPrice: parseFloat(startingPrice),
+        startDate: startDateTime.toISOString(),
+        endDate: endDateTime.toISOString(),
+      })
+      .then((response) => {
+        toast.success(response.data.message || "Subasta creada con éxito");
+        closeModal();
+      })
+      .catch((error) => {
+        console.error(error);
+        toast.error(
+          error.response?.data?.message || "Error al crear la subasta"
+        );
+      });
+  }
+
+  return (
+    <dialog open className="modal">
+      <div className="modal-box w-full max-w-6xl bg-primary text-white rounded-lg shadow-xl">
+        <form>
+          <button
+            type="button"
+            className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
+            onClick={closeModal}
+          >
+            <FaWindowClose className="text-4xl text-red-500 hover:text-red-600" />
+          </button>
+          <h2 className="text-2xl font-bold mb-4">
+            Agrega los datos de tu propiedad
+          </h2>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <label className="block">
+              Fecha de Inicio
+              <input
+                type="date"
+                name="startDate"
+                placeholder="Fecha de Inicio"
+                className="input input-bordered w-full bg-primary"
+                onChange={handleInputChange}
+                required
+              />
+            </label>
+
+            <label className="block">
+              Hora de Inicio
+              <input
+                type="time"
+                name="startTime"
+                placeholder="Hora de Inicio"
+                className="input input-bordered w-full bg-primary"
+                onChange={handleInputChange}
+                required
+              />
+            </label>
+
+            <label className="block">
+              Fecha de Fin
+              <input
+                type="date"
+                name="endDate"
+                placeholder="Fecha de Fin"
+                className="input input-bordered w-full bg-primary"
+                onChange={handleInputChange}
+                required
+              />
+            </label>
+
+            <label className="block">
+              Hora de Fin
+              <input
+                type="time"
+                name="endTime"
+                placeholder="Hora de Fin"
+                className="input input-bordered w-full bg-primary"
+                onChange={handleInputChange}
+                required
+              />
+            </label>
+
+            <label className="block">
+              Precio Inicial
+              <input
+                type="number"
+                name="startingPrice"
+                placeholder="Precio Inicial"
+                className="input input-bordered w-full bg-primary"
+                onChange={handleInputChange}
+                required
+              />
+            </label>
+          </div>
+          {editmode ? (
+            <button
+              type="submit"
+              className="p-2 rounded-sm font-bold bg-accent hover:bg-yellow-500 w-full mt-6"
+              onClick={() => handleEdit()}
+            >
+              Editar
+            </button>
+          ) : realstates.length > 0 ? (
+            <div className="overflow-x-auto overflow-y-auto h-96">
+              <table className="table">
+                <thead>
+                  <tr className=" text-white">
+                    <th>Imagen</th>
+                    <th>Nombre</th>
+                    <th>Descripcion</th>
+                    <th>Precio</th>
+                    <th>Elegir</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {realstates.map((state) => (
+                    <tr key={state.id}>
+                      <td>
+                        <div className="avatar">
+                          <div className="mask mask-squircle h-20 w-20">
+                            <img
+                              src={`${
+                                import.meta.env.VITE_BACKEND_URL
+                              }/realstates/img/${state.images[0].id}`}
+                              alt="Avatar Tailwind CSS Component"
+                            />
+                          </div>
+                        </div>{" "}
+                      </td>
+                      <td>
+                        <h1 className=" text-lg">
+                          <strong>{state.name}</strong>
+                        </h1>
+
+                        <span className="badge bg-accent text-black badge-sm">
+                          Phone: {state.phone}
+                        </span>
+                        <br />
+                        <span className="badge  bg-secondary text-black badge-sm  overflow-x-hidden overflow-y-hidden">
+                          {state.email}
+                        </span>
+                      </td>
+                      <td>
+                        <h1 className=" text-md">
+                          <strong>{state.description.substring(0, 250)}</strong>
+                        </h1>
+                      </td>
+                      <td>
+                        <h1 className=" text-md">
+                          <strong>${state.price}</strong>
+                        </h1>
+                      </td>
+                      <td>
+                        <button
+                          className="p-2 rounded-sm font-bold bg-accent hover:bg-yellow-500 w-full my-6"
+                          onClick={() => handleSubmit(state.id)}
+                        >
+                          Crear Subasta
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <h1 className=" text-lg">
+              <strong>
+                No hay propiedades todavía, crea publicaciones sin subastas y
+                aquí aparecerán!
+              </strong>
+            </h1>
+          )}
+        </form>
+      </div>
+    </dialog>
+  );
+};
+export default AuctionModal;

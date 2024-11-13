@@ -15,7 +15,15 @@ class AuctionController {
           startingPrice: +startingPrice,
           startDate: new Date(startDate),
           endDate: new Date(endDate),
-          realState: { connect: { id: realStateId } },
+          realState: { connect: { id: +realStateId } },
+        },
+      });
+      const editas = await prisma.realState.update({
+        where: {
+          id: +realStateId,
+        },
+        data: {
+          status: "SUBASTA",
         },
       });
 
@@ -134,6 +142,14 @@ class AuctionController {
       return res.status(500).json({ message: "Error al realizar la puja" });
     }
   }
+  static async getRealStateWithoutAuctions(req: Request, res: Response) {
+    const { id } = req.params;
+    const realStates = await prisma.realState.findMany({
+      where: { user_id: +id, auction: null },
+      include: { amenitie: true, images: true },
+    });
+    return res.json(realStates);
+  }
 
   // Mostrar detalles de todas las subastas del usuario y las 10 mejores pujas (excluyendo duplicadas de un mismo usuario)
   static async getMyAuctions(req: Request, res: Response) {
@@ -143,7 +159,52 @@ class AuctionController {
       const auction = await prisma.auction.findMany({
         where: { realState: { user_id: parseInt(id) } },
         include: {
-          realState: true,
+          realState: { include: { images: true } },
+          bids: {
+            include: {
+              user: { select: { id: true, name: true, email: true } },
+            },
+            orderBy: { amount: "desc" },
+          },
+        },
+      });
+
+      if (!auction) {
+        return res.status(404).json({ message: "Datos no encontrados" });
+      }
+
+      auction.map((subasta) => {
+        const uniqueBids: { [user_id: number]: boolean } = {};
+        const top10Bids = subasta.bids
+          .filter((bid) => {
+            if (!uniqueBids[bid.user_id]) {
+              uniqueBids[bid.user_id] = true;
+              return true;
+            }
+            return false;
+          })
+          .slice(0, 10);
+        subasta.bids = top10Bids;
+      });
+
+      return res.status(200).json(auction);
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({
+        message: "Error al obtener los detalles de la subasta",
+      });
+    }
+  }
+
+  // Mostrar detalles de todas las subastas del usuario que ha pujado y las 10 mejores pujas (excluyendo duplicadas de un mismo usuario)
+  static async getMyAuctionBids(req: Request, res: Response) {
+    const { id } = req.params;
+
+    try {
+      const auction = await prisma.auction.findMany({
+        where: { bids: { some: { user_id: parseInt(id) } } },
+        include: {
+          realState: { include: { images: true } },
           bids: {
             include: {
               user: { select: { id: true, name: true, email: true } },
@@ -185,7 +246,7 @@ class AuctionController {
     try {
       const auction = await prisma.auction.findMany({
         include: {
-          realState: true,
+          realState: { include: { images: true } },
           bids: {
             include: {
               user: { select: { id: true, name: true, email: true } },
