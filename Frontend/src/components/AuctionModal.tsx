@@ -15,9 +15,14 @@ import { toast } from "react-toastify";
 type RealStateModalProps = {
   closeModal: () => void;
   editmode: boolean;
+  auctionData: any;
 };
 
-const AuctionModal = ({ closeModal, editmode }: RealStateModalProps) => {
+const AuctionModal = ({
+  closeModal,
+  editmode,
+  auctionData,
+}: RealStateModalProps) => {
   const user = useUserStore((state: any) => state.user);
   const [formData, setFormData] = useState({
     startingPrice: "",
@@ -46,7 +51,75 @@ const AuctionModal = ({ closeModal, editmode }: RealStateModalProps) => {
       GetRealStates();
     }
   }, []);
-  function handleEdit() {}
+
+  useEffect(() => {
+    if (editmode && auctionData) {
+      console.log(auctionData);
+      setFormData({
+        startingPrice: auctionData.startingPrice.toString(),
+        startDate: auctionData.startDate.split("T")[0],
+        startTime: auctionData.startDate.split("T")[1].substring(0, 5),
+        endDate: auctionData.endDate.split("T")[0],
+        endTime: auctionData.endDate.split("T")[1].substring(0, 5),
+      });
+    }
+  }, [editmode, auctionData]);
+  function handleEdit(auctionId: number) {
+    const { startingPrice, startDate, startTime, endDate, endTime } = formData;
+
+    // Validación de campos obligatorios
+    if (Object.values(formData).some((field) => !field)) {
+      toast.warn("Todos los campos deben estar completos.");
+      return;
+    }
+
+    // Combina la fecha y hora de inicio usando date-fns
+    const startDateTime = set(parseISO(startDate), {
+      hours: parseInt(startTime.split(":")[0]),
+      minutes: parseInt(startTime.split(":")[1]),
+      seconds: 0,
+    });
+
+    // Combina la fecha y hora de fin usando date-fns
+    const endDateTime = set(parseISO(endDate), {
+      hours: parseInt(endTime.split(":")[0]),
+      minutes: parseInt(endTime.split(":")[1]),
+      seconds: 0,
+    });
+
+    // Validación de fechas
+    const now = new Date();
+    if (isBefore(startDateTime, now) || isBefore(endDateTime, now)) {
+      toast.error("Las fechas no pueden ser en el pasado.");
+      return;
+    }
+    if (isAfter(startDateTime, endDateTime)) {
+      toast.error(
+        "La fecha y hora de inicio no pueden ser mayores que la de fin."
+      );
+      return;
+    }
+
+    axios
+      .patch(`${import.meta.env.VITE_BACKEND_URL}/auction/${auctionId}`, {
+        startingPrice: parseFloat(startingPrice),
+        startDate: startDateTime.toISOString(),
+        endDate: endDateTime.toISOString(),
+      })
+      .then((response) => {
+        toast.success(
+          response.data.message || "Fecha de la subasta actualizada con éxito"
+        );
+        closeModal();
+      })
+      .catch((error) => {
+        console.error(error);
+        toast.error(
+          error.response?.data?.message ||
+            "Error al actualizar la fecha de la subasta"
+        );
+      });
+  }
   function handleSubmit(realStateId: number) {
     const { startingPrice, startDate, startTime, endDate, endTime } = formData;
 
@@ -116,7 +189,6 @@ const AuctionModal = ({ closeModal, editmode }: RealStateModalProps) => {
           <h2 className="text-2xl font-bold mb-4">
             Agrega los datos de tu propiedad
           </h2>
-
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <label className="block">
               Fecha de Inicio
@@ -126,6 +198,7 @@ const AuctionModal = ({ closeModal, editmode }: RealStateModalProps) => {
                 placeholder="Fecha de Inicio"
                 className="input input-bordered w-full bg-primary"
                 onChange={handleInputChange}
+                value={formData.startDate || ""}
                 required
               />
             </label>
@@ -138,6 +211,7 @@ const AuctionModal = ({ closeModal, editmode }: RealStateModalProps) => {
                 placeholder="Hora de Inicio"
                 className="input input-bordered w-full bg-primary"
                 onChange={handleInputChange}
+                value={formData.startTime || ""}
                 required
               />
             </label>
@@ -150,6 +224,7 @@ const AuctionModal = ({ closeModal, editmode }: RealStateModalProps) => {
                 placeholder="Fecha de Fin"
                 className="input input-bordered w-full bg-primary"
                 onChange={handleInputChange}
+                value={formData.endDate || ""}
                 required
               />
             </label>
@@ -162,6 +237,7 @@ const AuctionModal = ({ closeModal, editmode }: RealStateModalProps) => {
                 placeholder="Hora de Fin"
                 className="input input-bordered w-full bg-primary"
                 onChange={handleInputChange}
+                value={formData.endTime || ""}
                 required
               />
             </label>
@@ -174,6 +250,7 @@ const AuctionModal = ({ closeModal, editmode }: RealStateModalProps) => {
                 placeholder="Precio Inicial"
                 className="input input-bordered w-full bg-primary"
                 onChange={handleInputChange}
+                value={formData.startingPrice || ""}
                 required
               />
             </label>
@@ -182,7 +259,7 @@ const AuctionModal = ({ closeModal, editmode }: RealStateModalProps) => {
             <button
               type="submit"
               className="p-2 rounded-sm font-bold bg-accent hover:bg-yellow-500 w-full mt-6"
-              onClick={() => handleEdit()}
+              onClick={() => handleEdit(auctionData.id)}
             >
               Editar
             </button>

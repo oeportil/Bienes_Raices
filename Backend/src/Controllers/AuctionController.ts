@@ -42,7 +42,7 @@ class AuctionController {
   // Editar fecha de la subasta (solo si falta más de 3 días para el inicio)
   static async editAuctionDate(req: Request, res: Response) {
     const { id } = req.params;
-    const { startDate, endDate } = req.body;
+    const { startDate, endDate, startingPrice } = req.body;
 
     try {
       const auction = await prisma.auction.findUnique({
@@ -63,7 +63,11 @@ class AuctionController {
 
       const updatedAuction = await prisma.auction.update({
         where: { id: parseInt(id) },
-        data: { startDate: new Date(startDate), endDate: new Date(endDate) },
+        data: {
+          startDate: new Date(startDate),
+          endDate: new Date(endDate),
+          startingPrice,
+        },
       });
 
       return res.status(200).json({

@@ -10,6 +10,8 @@ export default function MyAuctions() {
   const [auctions, setAuctions] = useState([]); // Estado para almacenar todas las subastas
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [isEditMode, setIsEditMode] = useState<boolean>(false);
+  const [userBiddedAuctions, setUserBiddedAuctions] = useState([]);
+  const [selectedAuction, setSelectedAuction] = useState(null);
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
@@ -18,15 +20,33 @@ export default function MyAuctions() {
     }
   };
 
+  const handleEditAuction = async (auctionId: number) => {
+    try {
+      const url = `${import.meta.env.VITE_BACKEND_URL}/auction/${auctionId}`;
+      const { data } = await axios.get(url);
+      setSelectedAuction(data.auction.details); // Guardar los datos de la subasta seleccionada
+      setIsEditMode(true);
+      setIsModalOpen(true);
+    } catch (error) {
+      console.error("Error al obtener los datos de la subasta:", error);
+    }
+  };
   // Simula una carga de datos de subastas (puedes reemplazarlo con una llamada a la API)
   useEffect(() => {
     const fetchAuctions = async () => {
       const url = `${import.meta.env.VITE_BACKEND_URL}/auction/user/${user.id}`;
       const { data } = await axios.get(url);
-      console.log(url);
       setAuctions(data);
     };
+    const fecthBidded = async () => {
+      const url2 = `${import.meta.env.VITE_BACKEND_URL}/auction/mypuja/${
+        user.id
+      }`;
+      const { data } = await axios.get(url2);
+      setUserBiddedAuctions(data);
+    };
     fetchAuctions();
+    fecthBidded();
   }, []);
 
   // Filtra las subastas creadas por el usuario y añade las condiciones para editar o eliminar
@@ -37,17 +57,6 @@ export default function MyAuctions() {
     isAfter(new Date(endDate), subDays(new Date(), 3));
   const canDeleteAuction = (endDate: Date) =>
     isBefore(new Date(endDate), new Date());
-
-  // Filtra las subastas en las que el usuario ha pujado
-  const userBiddedAuctions = auctions
-    .filter((auction) => auction.bids.some((bid) => bid.user_id === user.id))
-    .sort((a, b) => {
-      // Ordena por subastas activas primero, luego las terminadas
-      const now = new Date();
-      const aEnded = isBefore(new Date(a.endDate), now);
-      const bEnded = isBefore(new Date(b.endDate), now);
-      return aEnded === bEnded ? 0 : aEnded ? 1 : -1;
-    });
 
   return (
     <div>
@@ -66,39 +75,59 @@ export default function MyAuctions() {
       </button>
 
       {isModalOpen && (
-        <AuctionModal closeModal={handleCloseModal} editmode={isEditMode} />
+        <AuctionModal
+          closeModal={handleCloseModal}
+          editmode={isEditMode}
+          auctionData={selectedAuction}
+        />
       )}
 
       <div className="my-8 mx-32">
         <h2 className="text-2xl font-bold text-black">Mis Subastas</h2>
+        <br />
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {userAuctions.map((auction) => (
-            <div key={auction.id} className="p-4 border rounded-lg shadow">
-              <h3 className="text-lg font-bold">{auction.realState.name}</h3>
-              <p>Precio inicial: ${auction.startingPrice}</p>
-              <p>
-                Fecha de inicio:{" "}
-                {new Date(auction.startDate).toLocaleDateString()}
-              </p>
-              <p>
-                Fecha de fin: {new Date(auction.endDate).toLocaleDateString()}
-              </p>
-              {canEditAuction(auction.endDate) && (
-                <button
-                  onClick={() => {
-                    setIsEditMode(true);
-                    setIsModalOpen(true);
-                  }}
-                  className="bg-blue-500 text-white p-2 rounded mt-2"
-                >
-                  Editar
-                </button>
-              )}
-              {canDeleteAuction(auction.endDate) && (
-                <button className="bg-red-500 text-white p-2 rounded mt-2">
-                  Eliminar
-                </button>
-              )}
+            <div
+              key={auction.id}
+              className="p-4 border rounded-lg shadow grid grid-cols-2"
+            >
+              <div>
+                <h3 className="text-lg font-bold">{auction.realState.name}</h3>
+                <h3 className="text-sm ">
+                  {auction.realState.description.substring(0, 250)}
+                </h3>
+                <p>Precio inicial: ${auction.startingPrice}</p>
+                <p>
+                  Fecha de inicio:{" "}
+                  {new Date(auction.startDate).toLocaleDateString()}
+                </p>
+                <p>
+                  Fecha de fin: {new Date(auction.endDate).toLocaleDateString()}
+                </p>
+                {canEditAuction(auction.endDate) && (
+                  <button
+                    onClick={() => {
+                      handleEditAuction(auction.id);
+                    }}
+                    className="bg-blue-500 text-white p-2 rounded mt-2"
+                  >
+                    Editar
+                  </button>
+                )}
+                {canDeleteAuction(auction.endDate) && (
+                  <button className="bg-red-500 text-white p-2 rounded mt-2">
+                    Eliminar
+                  </button>
+                )}
+              </div>
+              <div>
+                <img
+                  src={`${import.meta.env.VITE_BACKEND_URL}/realstates/img/${
+                    auction.realState.images[0].id
+                  }`}
+                  alt="Avatar Tailwind CSS Component"
+                />
+              </div>
             </div>
           ))}
         </div>
@@ -108,24 +137,41 @@ export default function MyAuctions() {
         <h2 className="text-2xl font-bold text-black">
           Subastas en las que has pujado
         </h2>
+        <br />
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {userBiddedAuctions.map((auction) => (
-            <div key={auction.id} className="p-4 border rounded-lg shadow">
-              <h3 className="text-lg font-bold">{auction.realState.name}</h3>
-              <p>Precio inicial: ${auction.startingPrice}</p>
-              <p>
-                Fecha de inicio:{" "}
-                {new Date(auction.startDate).toLocaleDateString()}
-              </p>
-              <p>
-                Fecha de fin: {new Date(auction.endDate).toLocaleDateString()}
-              </p>
-              <p>
-                Estado:{" "}
-                {isAfter(new Date(auction.endDate), new Date())
-                  ? "Activa"
-                  : "Finalizada"}
-              </p>
+            <div
+              key={auction.id}
+              className="p-4 border rounded-lg shadow grid grid-cols-2"
+            >
+              <div>
+                <h3 className="text-lg font-bold">{auction.realState.name}</h3>
+                <h3 className="text-sm ">
+                  {auction.realState.description.substring(0, 250)}
+                </h3>
+                <p>Precio inicial: ${auction.startingPrice}</p>
+                <p>
+                  Fecha de inicio:{" "}
+                  {new Date(auction.startDate).toLocaleDateString()}
+                </p>
+                <p>
+                  Fecha de fin: {new Date(auction.endDate).toLocaleDateString()}
+                </p>
+                <p>
+                  Estado:{" "}
+                  {isAfter(new Date(auction.endDate), new Date())
+                    ? "Activa"
+                    : "Finalizada"}
+                </p>
+              </div>
+              <div>
+                <img
+                  src={`${import.meta.env.VITE_BACKEND_URL}/realstates/img/${
+                    auction.realState.images[0].id
+                  }`}
+                  alt="Avatar Tailwind CSS Component"
+                />
+              </div>
             </div>
           ))}
         </div>
