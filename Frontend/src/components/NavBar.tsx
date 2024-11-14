@@ -39,7 +39,7 @@ const NavBar: React.FC = () => {
           <span className="font-bold text-xl">Box Safe</span>
         </Link>
 
-        <div className="hidden md:flex space-x-6">
+        <div className="hidden md:flex space-x-6 items-center">
           <Link to="/" className={`${linkClass("/")} px-3 py-2 rounded`}>
             Inicio
           </Link>

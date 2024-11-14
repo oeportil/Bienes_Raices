@@ -1,4 +1,4 @@
-import { useState, ChangeEvent, FormEvent } from "react";
+import { useState, ChangeEvent, FormEvent, useRef, useEffect } from "react";
 import {
   FaWindowClose,
   FaBath,
@@ -15,9 +15,19 @@ import { toast } from "react-toastify";
 
 type RealStateModalProps = {
   closeModal: () => void;
+  actFunction?: () => void;
+  refm?: React.RefObject<HTMLDialogElement>;
+  formState?: any;
+  edit?: boolean;
 };
 
-const RealStateFormModal = ({ closeModal }: RealStateModalProps) => {
+const RealStateFormModal = ({
+  closeModal,
+  actFunction,
+  refm,
+  formState,
+  edit,
+}: RealStateModalProps) => {
   const user = useUserStore((state: any) => state.user);
   const [formData, setFormData] = useState({
     name: "",
@@ -35,11 +45,52 @@ const RealStateFormModal = ({ closeModal }: RealStateModalProps) => {
   });
   const [images, setImages] = useState<File[]>([]);
   const [previews, setPreviews] = useState<string[]>([]);
+  const defaultRef = useRef<HTMLDialogElement>(null);
+
+  useEffect(() => {
+    if (edit) {
+      setFormData({
+        name: formState?.name || "",
+        description: formState?.description || "",
+        direction: formState?.direction || "",
+        phone: formState?.phone || "",
+        email: formState?.email || "",
+        price: formState?.price || "",
+        status: formState?.status || "",
+        wc: formState?.amenitie.wc || "",
+        dimension: formState?.amenitie.dimension || "",
+        parking: formState?.amenitie.parking || "",
+        rooms: formState?.amenitie.rooms || "",
+        gardens: formState?.amenitie.gardens || "",
+      });
+    } else {
+      setFormData({
+        name: "",
+        description: "",
+        direction: "",
+        phone: "",
+        email: "",
+        price: "",
+        status: "",
+        wc: "",
+        dimension: "",
+        parking: "",
+        rooms: "",
+        gardens: "",
+      });
+      setImages([]);
+      setPreviews([]);
+    }
+  }, [edit, formState]);
 
   const handleInputChange = (
     e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
   ) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value, type } = e.target;
+    setFormData({
+      ...formData,
+      [name]: type === "number" ? (value ? parseFloat(value) : "") : value,
+    });
   };
 
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -63,7 +114,6 @@ const RealStateFormModal = ({ closeModal }: RealStateModalProps) => {
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
-    // Validación de campos obligatorios
     if (Object.values(formData).some((field) => !field)) {
       toast.warn("Todos los campos deben estar completos.");
       return;
@@ -104,6 +154,7 @@ const RealStateFormModal = ({ closeModal }: RealStateModalProps) => {
       const url = `${import.meta.env.VITE_BACKEND_URL}/realstates`;
       const { data } = await axios.post<RealStateMessage>(url, dataToSend);
       toast.success(data.message);
+      actFunction?.();
       closeModal();
     } catch (error) {
       const message =
@@ -123,7 +174,7 @@ const RealStateFormModal = ({ closeModal }: RealStateModalProps) => {
   };
 
   return (
-    <dialog open className="modal">
+    <dialog id="my_modal_1" open className="modal z-50" ref={refm ?? defaultRef}>
       <div className="modal-box w-full max-w-6xl bg-gray-100 text-primary rounded-lg shadow-xl">
         <form onSubmit={handleSubmit}>
           <button
@@ -133,9 +184,7 @@ const RealStateFormModal = ({ closeModal }: RealStateModalProps) => {
           >
             <FaWindowClose className="text-4xl text-red-500 hover:text-red-600" />
           </button>
-          <h2 className="text-2xl font-bold mb-4">
-            Agrega los datos de tu propiedad
-          </h2>
+          <h2 className="text-2xl font-bold mb-4">Agrega los datos de tu propiedad</h2>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {["name", "direction", "phone", "email", "price"].map((field) => (
@@ -146,6 +195,7 @@ const RealStateFormModal = ({ closeModal }: RealStateModalProps) => {
                 placeholder={field.charAt(0).toUpperCase() + field.slice(1)}
                 className="input input-bordered w-full bg-white"
                 onChange={handleInputChange}
+                value={formData[`${field}`]}
                 required
               />
             ))}
@@ -153,6 +203,7 @@ const RealStateFormModal = ({ closeModal }: RealStateModalProps) => {
               name="status"
               className="select select-bordered w-full bg-white"
               onChange={handleInputChange}
+              value={formData.status}
               required
             >
               <option value="">Seleccione el estado</option>
@@ -165,6 +216,7 @@ const RealStateFormModal = ({ closeModal }: RealStateModalProps) => {
               placeholder="Descripción"
               className="textarea textarea-bordered w-full max-h-20 min-h-14 bg-white"
               onChange={handleInputChange}
+              value={formData.description}
               required
             ></textarea>
           </div>
@@ -174,11 +226,7 @@ const RealStateFormModal = ({ closeModal }: RealStateModalProps) => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {[
                 { name: "wc", icon: FaBath, placeholder: "Número de baños" },
-                {
-                  name: "dimension",
-                  icon: FaRulerCombined,
-                  placeholder: "Dimensión (m²)",
-                },
+                { name: "dimension", icon: FaRulerCombined, placeholder: "Dimensión (m²)" },
                 { name: "parking", icon: FaParking, placeholder: "Parqueos" },
                 { name: "rooms", icon: FaBed, placeholder: "Habitaciones" },
                 { name: "gardens", icon: FaTree, placeholder: "Jardines" },
@@ -188,7 +236,7 @@ const RealStateFormModal = ({ closeModal }: RealStateModalProps) => {
                   <input
                     type="number"
                     name={name}
-                    defaultValue={0}
+                    value={formData[name]}
                     min={0}
                     placeholder={placeholder}
                     className="input input-bordered w-full bg-white"
@@ -221,10 +269,10 @@ const RealStateFormModal = ({ closeModal }: RealStateModalProps) => {
                     />
                     <button
                       type="button"
-                      className="btn btn-circle btn-xs btn-error absolute top-2 right-2"
                       onClick={() => handleRemoveImage(index)}
+                      className="absolute top-2 right-2 bg-red-500 hover:bg-red-600 rounded-full p-1"
                     >
-                      X
+                      <FaWindowClose className="text-white" />
                     </button>
                   </div>
                 ))}
@@ -232,12 +280,11 @@ const RealStateFormModal = ({ closeModal }: RealStateModalProps) => {
             )}
           </div>
 
-          <button
-            type="submit"
-            className="p-2 rounded-sm font-bold bg-accent hover:bg-yellow-500 w-full mt-6"
-          >
-            Enviar
-          </button>
+          <div className="modal-action">
+            <button type="submit" className="btn btn-primary w-full">
+              {edit ? "Actualizar propiedad" : "Agregar propiedad"}
+            </button>
+          </div>
         </form>
       </div>
     </dialog>

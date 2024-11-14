@@ -1,14 +1,23 @@
 import { FaBed, FaEdit, FaParking, FaTrashAlt, FaTree } from "react-icons/fa";
 import { RealState } from "../../types";
 import { Link } from "react-router-dom";
+import Swal from "sweetalert2";
+import { toast } from "react-toastify";
+import axios from "axios";
+
 
 type EstateCardProps = {
   data: RealState;
+  actFunction?: () => void
+  setEdit?: (edit: boolean) => void;
+  setFormDataedi?: ({}: any) => void;
+  setIsModalOpen?: (open: boolean) => void;
 };
 
-export default function EstateCard({ data }: EstateCardProps) {
+export default function EstateCard({ data, actFunction, setEdit, setFormDataedi, setIsModalOpen }: EstateCardProps) {
   const ActualPath = location.pathname;
-  const { name, description, images, amenitie } = data;
+  const { name, description, images, amenitie, id } = data;
+
 
   // Límite de caracteres para la descripción
   const DESCRIPTION_LIMIT = 120;
@@ -61,10 +70,10 @@ export default function EstateCard({ data }: EstateCardProps) {
         {/* Botones de edición y eliminación */}
         {ActualPath !== "/propiedades" && (
           <div className="flex justify-end w-full gap-4 mt-4">
-            <button className="flex items-center gap-2 bg-accent hover:bg-yellow-500 text-white rounded p-2">
+            <button onClick={() =>{setEdit!(true); setFormDataedi!(data); setIsModalOpen!(true);}} className="flex items-center gap-2 bg-accent hover:bg-yellow-500 text-white rounded p-2">
               Editar <FaEdit />
             </button>
-            <button className="flex items-center gap-2 bg-red-500 hover:bg-red-600 text-white rounded p-2">
+            <button onClick={() => Eliminar(id)} className="flex items-center gap-2 bg-red-500 hover:bg-red-600 text-white rounded p-2">
               Eliminar <FaTrashAlt />
             </button>
           </div>
@@ -72,4 +81,32 @@ export default function EstateCard({ data }: EstateCardProps) {
       </div>
     </div>
   );
+
+  function Eliminar(id: number): void {
+    Swal.fire({
+      title: "Estas Seguro de Eliminar El Bien Raiz",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, eliminar"
+    }).then(async(result) => {
+      if (result.isConfirmed) {
+        try {
+          const url = `${import.meta.env.VITE_BACKEND_URL}/realstates/${id}`
+          const url2 = `${import.meta.env.VITE_BACKEND_URL}/realstates/img/all/${id}`
+          const datos = Promise.all([axios.delete(url), axios.delete(url2)])
+          actFunction!();
+          Swal.fire({
+            title: "Eliminado",
+            text: "Eliminacion Exitosa",
+            icon: "success"
+          });
+        } catch (error) {
+          toast.error("Hubo un error al eliminar la propiedad");
+        }        
+      }
+    });
+    
+  }
 }
