@@ -2,9 +2,10 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { toast } from "react-toastify";
+import { RealState } from "../types";
 
 const SingleState = () => {
-  const [state, setState] = useState<any>(null);
+  const [state, setState] = useState<RealState>();
   const { id } = useParams();
 
   const data = async () => {
@@ -12,8 +13,8 @@ const SingleState = () => {
       const url = `${import.meta.env.VITE_BACKEND_URL}/realstates/${id}`;
       const { data } = await axios.get(url);
       setState(data);
-      console.log(data);
     } catch (error) {
+      console.error(error);
       toast.error("Hubo un error al obtener la propiedad");
     }
   };
@@ -29,12 +30,12 @@ const SingleState = () => {
         <div className="relative">
           <img
             src={`${import.meta.env.VITE_BACKEND_URL}/realstates/img/${
-                state?.images[0].id
-              }`}
+              state?.images[0].id
+            }`}
             alt={state?.name}
             className="w-full h-64 object-cover rounded-t-lg"
           />
-          <div className="absolute bottom-4 left-4 text-white">
+          <div className="absolute bottom-4 px-5 text-white bg-primary bg-opacity-40 w-full">
             <h1 className="text-4xl font-bold">{state?.name}</h1>
             <p className="text-lg">{state?.description}</p>
           </div>
@@ -70,14 +71,18 @@ const SingleState = () => {
             </div>
 
             <div>
-              <h2 className="text-2xl font-semibold text-gray-700">Amenidades</h2>
+              <h2 className="text-2xl font-semibold text-gray-700">
+                Amenidades
+              </h2>
               <ul className="mt-4 space-y-2">
                 <li className="flex justify-between">
                   <span className="font-medium text-gray-500">Baños:</span>
                   <span>{state?.amenitie?.wc}</span>
                 </li>
                 <li className="flex justify-between">
-                  <span className="font-medium text-gray-500">Dimensión (m²):</span>
+                  <span className="font-medium text-gray-500">
+                    Dimensión (m²):
+                  </span>
                   <span>{state?.amenitie?.dimension}</span>
                 </li>
                 <li className="flex justify-between">
@@ -85,7 +90,9 @@ const SingleState = () => {
                   <span>{state?.amenitie?.parking}</span>
                 </li>
                 <li className="flex justify-between">
-                  <span className="font-medium text-gray-500">Habitaciones:</span>
+                  <span className="font-medium text-gray-500">
+                    Habitaciones:
+                  </span>
                   <span>{state?.amenitie?.rooms}</span>
                 </li>
                 <li className="flex justify-between">
@@ -98,12 +105,16 @@ const SingleState = () => {
 
           {/* Images Slider */}
           <div className="mt-8">
-            <h2 className="text-2xl font-semibold text-gray-700 mb-4">Galería</h2>
+            <h2 className="text-2xl font-semibold text-gray-700 mb-4">
+              Galería
+            </h2>
             <div className="flex gap-4 overflow-x-auto">
               {state?.images?.map((image: any, index: number) => (
                 <img
                   key={index}
-                  src={`${import.meta.env.VITE_BACKEND_URL}/realstates/img/${image?.id}`}
+                  src={`${import.meta.env.VITE_BACKEND_URL}/realstates/img/${
+                    image?.id
+                  }`}
                   alt={`Image ${index + 1}`}
                   className="w-64 h-64 object-cover rounded-lg shadow-lg"
                 />
