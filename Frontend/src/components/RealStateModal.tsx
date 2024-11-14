@@ -239,7 +239,7 @@ const RealStateFormModal = ({
             <FaWindowClose className="text-4xl text-red-500 hover:text-red-600" />
           </button>
           <h2 className="text-2xl font-bold mb-4">
-            Agrega los datos de tu propiedad
+           {edit ?  "Edita" : "Agrega"} los datos de tu propiedad
           </h2>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
