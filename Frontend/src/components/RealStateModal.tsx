@@ -48,6 +48,29 @@ const RealStateFormModal = ({
   const defaultRef = useRef<HTMLDialogElement>(null);
   useEffect(() => {
     if (edit) {
+      async function fetchImagePreviews() {
+        if (!formState?.images || formState.images.length === 0) {
+          setPreviews([]);
+          return;
+        }
+
+        try {
+          // Genera las promesas de cada llamada a la API usando los IDs de las imágenes
+          const previewPromises = formState.images.map(async (image: any) => {
+            const response = await axios.get(
+              `${import.meta.env.VITE_BACKEND_URL}/realstates/img/${image.id}`
+            );
+            return response.data; // Asegúrate de que la respuesta contenga el URL de la imagen
+          });
+
+          // Espera a que todas las promesas se resuelvan y luego establece el estado con los resultados
+          const previewUrls = await Promise.all(previewPromises);
+          setPreviews(previewUrls);
+        } catch (error) {
+          console.error("Error al cargar las imágenes:", error);
+          toast.error("Error al cargar las imágenes");
+        }
+      }
       setFormData({
         name: formState?.name || "",
         description: formState?.description || "",
@@ -63,7 +86,8 @@ const RealStateFormModal = ({
         gardens: formState?.amenitie.gardens || "0",
       });
       // Inicializar previews con las URLs de imágenes existentes en el modo editar
-      setPreviews(formState?.images || []);
+
+      fetchImagePreviews();
     } else {
       // Limpiar el formulario y las imágenes al agregar una nueva propiedad
       setFormData({

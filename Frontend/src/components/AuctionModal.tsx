@@ -1,6 +1,9 @@
 import { useState, ChangeEvent, useEffect } from "react";
 import { parseISO, set, isBefore, isAfter, addHours } from "date-fns";
-import { toZonedTime as utcToZonedTime , fromZonedTime as zonedTimeToUtc } from "date-fns-tz";
+import {
+  toZonedTime as utcToZonedTime,
+  fromZonedTime as zonedTimeToUtc,
+} from "date-fns-tz";
 import { FaWindowClose } from "react-icons/fa";
 import useUserStore from "../Store/UserStore";
 import axios from "axios";
@@ -35,7 +38,9 @@ const AuctionModal = ({
 
   useEffect(() => {
     async function GetRealStates() {
-      const url = `${import.meta.env.VITE_BACKEND_URL}/auction/realstate/${user.id}`;
+      const url = `${import.meta.env.VITE_BACKEND_URL}/auction/realstate/${
+        user.id
+      }`;
       const { data } = await axios.get(url);
       setRealStates(data);
     }
@@ -71,7 +76,7 @@ const AuctionModal = ({
     // Combina fecha y hora de inicio
     const startDateTime = utcToZonedTime(
       set(parseISO(startDate), {
-        hours: parseInt(startTime.split(":")[0])-6,
+        hours: parseInt(startTime.split(":")[0]) - 6,
         minutes: parseInt(startTime.split(":")[1]),
         seconds: 0,
       }),
@@ -81,7 +86,7 @@ const AuctionModal = ({
     // Combina fecha y hora de fin
     const endDateTime = utcToZonedTime(
       set(parseISO(endDate), {
-        hours: parseInt(endTime.split(":")[0])-6,
+        hours: parseInt(endTime.split(":")[0]) - 6,
         minutes: parseInt(endTime.split(":")[1]),
         seconds: 0,
       }),
@@ -95,7 +100,9 @@ const AuctionModal = ({
       return;
     }
     if (isAfter(startDateTime, endDateTime)) {
-      toast.error("La fecha y hora de inicio no pueden ser mayores que la de fin.");
+      toast.error(
+        "La fecha y hora de inicio no pueden ser mayores que la de fin."
+      );
       return;
     }
 
@@ -106,12 +113,17 @@ const AuctionModal = ({
         endDate: zonedTimeToUtc(endDateTime, timeZone).toISOString(),
       })
       .then((response) => {
-        toast.success(response.data.message || "Fecha de la subasta actualizada con éxito");
+        toast.success(
+          response.data.message || "Fecha de la subasta actualizada con éxito"
+        );
         closeModal();
       })
       .catch((error) => {
         console.error(error);
-        toast.error(error.response?.data?.message || "Error al actualizar la fecha de la subasta");
+        toast.error(
+          error.response?.data?.message ||
+            "Error al actualizar la fecha de la subasta"
+        );
       });
   }
 
@@ -154,7 +166,9 @@ const AuctionModal = ({
       return;
     }
     if (isAfter(startDateTime, endDateTime)) {
-      toast.error("La fecha y hora de inicio no pueden ser mayores que la de fin.");
+      toast.error(
+        "La fecha y hora de inicio no pueden ser mayores que la de fin."
+      );
       return;
     }
 
@@ -171,7 +185,9 @@ const AuctionModal = ({
       })
       .catch((error) => {
         console.error(error);
-        toast.error(error.response?.data?.message || "Error al crear la subasta");
+        toast.error(
+          error.response?.data?.message || "Error al crear la subasta"
+        );
       });
   }
 
@@ -186,7 +202,9 @@ const AuctionModal = ({
           >
             <FaWindowClose className="text-4xl text-red-500 hover:text-red-600" />
           </button>
-          <h2 className="text-2xl font-bold mb-4">Agrega los datos de tu propiedad</h2>
+          <h2 className="text-2xl font-bold mb-4">
+            Agrega los datos de tu propiedad
+          </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <label className="block">
               Fecha de Inicio
@@ -259,17 +277,75 @@ const AuctionModal = ({
             </button>
           ) : realstates.length > 0 ? (
             realstates.map((realstate) => (
-              <button
-                type="button"
-                key={realstate.id}
-                className="p-2 rounded-sm font-bold bg-accent hover:bg-yellow-500 w-full mt-6"
-                onClick={() => handleSubmit(realstate.id)}
-              >
-                {realstate.name}
-              </button>
+              <div className="overflow-x-auto overflow-y-auto h-96">
+                <table className="table">
+                  <thead>
+                    <tr className=" text-white">
+                      <th>Imagen</th>
+                      <th>Nombre</th>
+                      <th>Descripcion</th>
+                      <th>Precio</th>
+                      <th>Elegir</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {realstates.map((state) => (
+                      <tr key={state.id}>
+                        <td>
+                          <div className="avatar">
+                            <div className="mask mask-squircle h-20 w-20">
+                              <img
+                                src={`${
+                                  import.meta.env.VITE_BACKEND_URL
+                                }/realstates/img/${state.images[0].id}`}
+                                alt="Avatar Tailwind CSS Component"
+                              />
+                            </div>
+                          </div>{" "}
+                        </td>
+                        <td>
+                          <h1 className=" text-lg">
+                            <strong>{state.name}</strong>
+                          </h1>
+
+                          <span className="badge bg-accent text-black badge-sm">
+                            Phone: {state.phone}
+                          </span>
+                          <br />
+                          <span className="badge  bg-secondary text-black badge-sm  overflow-x-hidden overflow-y-hidden">
+                            {state.email}
+                          </span>
+                        </td>
+                        <td>
+                          <h1 className=" text-md">
+                            <strong>
+                              {state.description.substring(0, 250)}
+                            </strong>
+                          </h1>
+                        </td>
+                        <td>
+                          <h1 className=" text-md">
+                            <strong>${state.price}</strong>
+                          </h1>
+                        </td>
+                        <td>
+                          <button
+                            className="p-2 rounded-sm font-bold bg-accent hover:bg-yellow-500 w-full my-6"
+                            onClick={() => handleSubmit(state.id)}
+                          >
+                            Crear Subasta
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             ))
           ) : (
-            <p className="text-red-500">No tienes propiedades disponibles para subastar.</p>
+            <p className="text-red-500">
+              No tienes propiedades disponibles para subastar.
+            </p>
           )}
         </form>
       </div>
