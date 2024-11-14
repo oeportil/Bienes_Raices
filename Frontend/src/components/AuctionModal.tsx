@@ -1,13 +1,6 @@
-import { useState, ChangeEvent, FormEvent, useEffect } from "react";
-import { parseISO, set, isBefore, isAfter, isToday } from "date-fns";
-import {
-  FaWindowClose,
-  FaBath,
-  FaRulerCombined,
-  FaParking,
-  FaBed,
-  FaTree,
-} from "react-icons/fa";
+import { useState, ChangeEvent, useEffect } from "react";
+import { parseISO, set, isBefore, isAfter } from "date-fns";
+import { FaWindowClose } from "react-icons/fa";
 import useUserStore from "../Store/UserStore";
 import axios from "axios";
 import { toast } from "react-toastify";

@@ -1,7 +1,7 @@
 import RealStateModal from "../../components/RealStateModal";
 import useUserStore from "../../Store/UserStore";
 import { FaPlusCircle } from "react-icons/fa";
-import CarouselOfUserEstates from "../../components/EstatesComponents/CarouselOfUserEstates";
+import CarouselOfEstates from "../../components/EstatesComponents/CarouselOfEstates";
 import { useState } from "react";
 
 const RealStateCRUD = () => {
@@ -25,8 +25,7 @@ const RealStateCRUD = () => {
         Nueva Propiedad
         <FaPlusCircle className="text-white text-xl" />
       </button>
-
-      <CarouselOfUserEstates />
+      {/*Acá falta el carousel si es lo que buscan */}
       {isModalOpen && <RealStateModal closeModal={handleCloseModal} />}
     </main>
   );

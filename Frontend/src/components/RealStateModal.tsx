@@ -87,7 +87,7 @@ const RealStateFormModal = ({ closeModal }: RealStateModalProps) => {
         status: formData.status,
       })
     );
-    console.log(dataToSend);
+
     dataToSend.append(
       "amenitie",
       JSON.stringify({
@@ -188,6 +188,8 @@ const RealStateFormModal = ({ closeModal }: RealStateModalProps) => {
                   <input
                     type="number"
                     name={name}
+                    defaultValue={0}
+                    min={0}
                     placeholder={placeholder}
                     className="input input-bordered w-full bg-white"
                     onChange={handleInputChange}

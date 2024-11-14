@@ -1,4 +1,5 @@
 import { FC } from "react";
+import { RealState } from "../types";
 
 interface PropertyCardProps {
   property: RealState; // Define aquí el tipo de propiedad
