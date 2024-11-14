@@ -9,7 +9,7 @@ type EstateCardProps = {
   data: RealState;
   actFunction?: () => void;
   setEdit?: (edit: boolean) => void;
-  setFormDataedi?: ({}: any) => void;
+  setFormDataedi?: ({}: RealState) => void;
   setIsModalOpen?: (open: boolean) => void;
 };
 
@@ -111,7 +111,7 @@ export default function EstateCard({
           const url2 = `${
             import.meta.env.VITE_BACKEND_URL
           }/realstates/img/all/${id}`;
-          const datos = Promise.all([axios.delete(url), axios.delete(url2)]);
+          Promise.all([axios.delete(url), axios.delete(url2)]);
           actFunction!();
           Swal.fire({
             title: "Eliminado",
@@ -119,6 +119,7 @@ export default function EstateCard({
             icon: "success",
           });
         } catch (error) {
+          console.error("Error al eliminar la propiedad:", error);
           toast.error("Hubo un error al eliminar la propiedad");
         }
       }

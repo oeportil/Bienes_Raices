@@ -113,7 +113,7 @@ const RealStateFormModal = ({
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-  
+
     // Validar que todos los campos estén completos
     if (Object.values(formData).some((field) => !field)) {
       toast.warn("Todos los campos deben estar completos.");
@@ -123,39 +123,46 @@ const RealStateFormModal = ({
       toast.warn("Debe subir al menos una imagen.");
       return;
     }
-  
+
     try {
       if (edit) {
-        // Editar datos de la propiedad       
-         const realstate = {
-            user_id: user.id,
-            name: formData.name,
-            description: formData.description,
-            direction: formData.direction,
-            phone: formData.phone,
-            email: formData.email,
-            price: parseFloat(formData.price),
-            status: formData.status,
-          }     
-        
-         const amenitie = {
-            wc: parseInt(formData.wc),
-            dimension: parseFloat(formData.dimension),
-            parking: parseInt(formData.parking),
-            rooms: parseInt(formData.rooms),
-            gardens: parseInt(formData.gardens),
-          }
+        // Editar datos de la propiedad
+        const realstate = {
+          user_id: user.id,
+          name: formData.name,
+          description: formData.description,
+          direction: formData.direction,
+          phone: formData.phone,
+          email: formData.email,
+          price: parseFloat(formData.price),
+          status: formData.status,
+        };
+
+        const amenitie = {
+          wc: parseInt(formData.wc),
+          dimension: parseFloat(formData.dimension),
+          parking: parseInt(formData.parking),
+          rooms: parseInt(formData.rooms),
+          gardens: parseInt(formData.gardens),
+        };
         // Enviar datos al endpoint para editar la propiedad
-        const urlEdit = `${import.meta.env.VITE_BACKEND_URL}/realstates/${formState.id}`;
-        const responseEdit = await axios.patch(urlEdit, {amenitie, realstate});
+        const urlEdit = `${import.meta.env.VITE_BACKEND_URL}/realstates/${
+          formState.id
+        }`;
+        const responseEdit = await axios.patch(urlEdit, {
+          amenitie,
+          realstate,
+        });
         toast.success(responseEdit.data.message);
-  
+
         // Editar imágenes solo si hay nuevas
         if (images.length > 0) {
           const imgData = new FormData();
           images.forEach((image) => imgData.append("images", image));
-          
-          const urlImgEdit = `${import.meta.env.VITE_BACKEND_URL}/realstates/img/${formState.id}`;
+
+          const urlImgEdit = `${
+            import.meta.env.VITE_BACKEND_URL
+          }/realstates/img/${formState.id}`;
           const responseImgEdit = await axios.patch(urlImgEdit, imgData);
           toast.success(responseImgEdit.data.message);
         }
@@ -186,16 +193,18 @@ const RealStateFormModal = ({
           })
         );
         images.forEach((image) => dataToSend.append("images", image));
-  
+
         const urlCreate = `${import.meta.env.VITE_BACKEND_URL}/realstates`;
-        const responseCreate = await axios.post<RealStateMessage>(urlCreate, dataToSend);
+        const responseCreate = await axios.post<RealStateMessage>(
+          urlCreate,
+          dataToSend
+        );
         toast.success(responseCreate.data.message);
       }
-  
+
       // Ejecutar función adicional y cerrar modal
       actFunction?.();
       closeModal();
-  
     } catch (error) {
       const message =
         axios.isAxiosError(error) && error.response
@@ -204,7 +213,6 @@ const RealStateFormModal = ({
       toast.error(message);
     }
   };
-  
 
   const settings = {
     dots: true,
@@ -215,7 +223,12 @@ const RealStateFormModal = ({
   };
 
   return (
-    <dialog id="my_modal_1" open className="modal z-50" ref={refm ?? defaultRef}>
+    <dialog
+      id="my_modal_1"
+      open
+      className="modal z-50"
+      ref={refm ?? defaultRef}
+    >
       <div className="modal-box w-full max-w-6xl bg-gray-100 text-primary rounded-lg shadow-xl">
         <form onSubmit={handleSubmit}>
           <button
@@ -225,7 +238,9 @@ const RealStateFormModal = ({
           >
             <FaWindowClose className="text-4xl text-red-500 hover:text-red-600" />
           </button>
-          <h2 className="text-2xl font-bold mb-4">Agrega los datos de tu propiedad</h2>
+          <h2 className="text-2xl font-bold mb-4">
+            Agrega los datos de tu propiedad
+          </h2>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {["name", "direction", "phone", "email", "price"].map((field) => (
@@ -267,7 +282,11 @@ const RealStateFormModal = ({
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {[
                 { name: "wc", icon: FaBath, placeholder: "Número de baños" },
-                { name: "dimension", icon: FaRulerCombined, placeholder: "Dimensión (m²)" },
+                {
+                  name: "dimension",
+                  icon: FaRulerCombined,
+                  placeholder: "Dimensión (m²)",
+                },
                 { name: "parking", icon: FaParking, placeholder: "Parqueos" },
                 { name: "rooms", icon: FaBed, placeholder: "Habitaciones" },
                 { name: "gardens", icon: FaTree, placeholder: "Jardines" },
@@ -322,7 +341,10 @@ const RealStateFormModal = ({
           </div>
 
           <div className="modal-action">
-            <button type="submit" className="btn btn-primary w-full">
+            <button
+              type="submit"
+              className="bg-accent text-white font-bold p-2 rounded-sm hover:bg-yellow-500 w-full"
+            >
               {edit ? "Actualizar propiedad" : "Agregar propiedad"}
             </button>
           </div>
