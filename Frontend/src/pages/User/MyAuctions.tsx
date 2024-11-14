@@ -3,11 +3,11 @@ import { FaPlusCircle } from "react-icons/fa";
 import { useState, useEffect } from "react";
 import AuctionModal from "../../components/AuctionModal";
 import axios from "axios";
-import { formatDistanceToNow, isAfter, isBefore, subDays } from "date-fns"; // Importar funciones de date-fns para manejar fechas
+import { isAfter,  subDays } from "date-fns"; // Importar funciones de date-fns para manejar fechas
 
 export default function MyAuctions() {
   const user = useUserStore((state: any) => state.user);
-  const [auctions, setAuctions] = useState([]); // Estado para almacenar todas las subastas
+  const [auctions, setAuctions] = useState<any[]>([]); // Estado para almacenar todas las subastas
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [isEditMode, setIsEditMode] = useState<boolean>(false);
   const [userBiddedAuctions, setUserBiddedAuctions] = useState([]);
@@ -55,8 +55,8 @@ export default function MyAuctions() {
   );
   const canEditAuction = (endDate: Date) =>
     isAfter(new Date(endDate), subDays(new Date(), 3));
-  const canDeleteAuction = (endDate: Date) =>
-    isBefore(new Date(endDate), new Date());
+  // const canDeleteAuction = (endDate: Date) =>
+  //   isBefore(new Date(endDate), new Date());
 
   return (
     <div>
@@ -128,13 +128,13 @@ export default function MyAuctions() {
         </div>
       </div>
 
-      <div className="my-8 my-8 mx-32">
+      <div className="my-8 mx-32">
         <h2 className="text-2xl font-bold text-black">
           Subastas en las que has pujado
         </h2>
         <br />
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {userBiddedAuctions.map((auction) => (
+          {userBiddedAuctions.map((auction: any) => (
             <div
               key={auction.id}
               className="p-4 border rounded-lg shadow grid grid-cols-2"
