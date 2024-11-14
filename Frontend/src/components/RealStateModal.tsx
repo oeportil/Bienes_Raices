@@ -58,9 +58,10 @@ const RealStateFormModal = ({
           // Genera las promesas de cada llamada a la API usando los IDs de las imágenes
           const previewPromises = formState.images.map(async (image: any) => {
             const response = await axios.get(
-              `${import.meta.env.VITE_BACKEND_URL}/realstates/img/${image.id}`
+              `${import.meta.env.VITE_BACKEND_URL}/realstates/img/${image.id}`,
+              { responseType: "blob" }
             );
-            return response.data; // Asegúrate de que la respuesta contenga el URL de la imagen
+            return URL.createObjectURL(response.data); // Asegúrate de que la respuesta contenga el URL de la imagen
           });
 
           // Espera a que todas las promesas se resuelvan y luego establece el estado con los resultados
@@ -247,7 +248,7 @@ const RealStateFormModal = ({
     slidesToShow: 1,
     slidesToScroll: 1,
   };
-  console.log(JSON.stringify(previews));
+  console.log(previews[0]);
   return (
     <dialog
       id="my_modal_1"
