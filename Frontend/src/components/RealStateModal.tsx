@@ -113,49 +113,89 @@ const RealStateFormModal = ({
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-
+  
+    // Validar que todos los campos estén completos
     if (Object.values(formData).some((field) => !field)) {
       toast.warn("Todos los campos deben estar completos.");
       return;
     }
-    if (images.length === 0) {
+    if (!edit && images.length === 0) {
       toast.warn("Debe subir al menos una imagen.");
       return;
     }
-
-    const dataToSend = new FormData();
-    dataToSend.append(
-      "realstate",
-      JSON.stringify({
-        user_id: user.id,
-        name: formData.name,
-        description: formData.description,
-        direction: formData.direction,
-        phone: formData.phone,
-        email: formData.email,
-        price: parseFloat(formData.price),
-        status: formData.status,
-      })
-    );
-
-    dataToSend.append(
-      "amenitie",
-      JSON.stringify({
-        wc: parseInt(formData.wc),
-        dimension: parseFloat(formData.dimension),
-        parking: parseInt(formData.parking),
-        rooms: parseInt(formData.rooms),
-        gardens: parseInt(formData.gardens),
-      })
-    );
-    images.forEach((image) => dataToSend.append("images", image));
-
+  
     try {
-      const url = `${import.meta.env.VITE_BACKEND_URL}/realstates`;
-      const { data } = await axios.post<RealStateMessage>(url, dataToSend);
-      toast.success(data.message);
+      if (edit) {
+        // Editar datos de la propiedad       
+         const realstate = {
+            user_id: user.id,
+            name: formData.name,
+            description: formData.description,
+            direction: formData.direction,
+            phone: formData.phone,
+            email: formData.email,
+            price: parseFloat(formData.price),
+            status: formData.status,
+          }     
+        
+         const amenitie = {
+            wc: parseInt(formData.wc),
+            dimension: parseFloat(formData.dimension),
+            parking: parseInt(formData.parking),
+            rooms: parseInt(formData.rooms),
+            gardens: parseInt(formData.gardens),
+          }
+        // Enviar datos al endpoint para editar la propiedad
+        const urlEdit = `${import.meta.env.VITE_BACKEND_URL}/realstates/${formState.id}`;
+        const responseEdit = await axios.patch(urlEdit, {amenitie, realstate});
+        toast.success(responseEdit.data.message);
+  
+        // Editar imágenes solo si hay nuevas
+        if (images.length > 0) {
+          const imgData = new FormData();
+          images.forEach((image) => imgData.append("images", image));
+          
+          const urlImgEdit = `${import.meta.env.VITE_BACKEND_URL}/realstates/img/${formState.id}`;
+          const responseImgEdit = await axios.patch(urlImgEdit, imgData);
+          toast.success(responseImgEdit.data.message);
+        }
+      } else {
+        // Crear nueva propiedad
+        const dataToSend = new FormData();
+        dataToSend.append(
+          "realstate",
+          JSON.stringify({
+            user_id: user.id,
+            name: formData.name,
+            description: formData.description,
+            direction: formData.direction,
+            phone: formData.phone,
+            email: formData.email,
+            price: parseFloat(formData.price),
+            status: formData.status,
+          })
+        );
+        dataToSend.append(
+          "amenitie",
+          JSON.stringify({
+            wc: parseInt(formData.wc),
+            dimension: parseFloat(formData.dimension),
+            parking: parseInt(formData.parking),
+            rooms: parseInt(formData.rooms),
+            gardens: parseInt(formData.gardens),
+          })
+        );
+        images.forEach((image) => dataToSend.append("images", image));
+  
+        const urlCreate = `${import.meta.env.VITE_BACKEND_URL}/realstates`;
+        const responseCreate = await axios.post<RealStateMessage>(urlCreate, dataToSend);
+        toast.success(responseCreate.data.message);
+      }
+  
+      // Ejecutar función adicional y cerrar modal
       actFunction?.();
       closeModal();
+  
     } catch (error) {
       const message =
         axios.isAxiosError(error) && error.response
@@ -164,6 +204,7 @@ const RealStateFormModal = ({
       toast.error(message);
     }
   };
+  
 
   const settings = {
     dots: true,
