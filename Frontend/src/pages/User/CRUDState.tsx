@@ -16,6 +16,14 @@ const RealStateCRUD = () => {
     slidesToShow: 3,
     slidesToScroll: 1,
     arrow: true,
+    responsive: [
+      {
+        breakpoint: 768, // Tablets
+        settings: {
+          slidesToShow: 1,
+        },
+      },
+    ],
   };
   const user = useUserStore((state: any) => state.user);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
@@ -48,6 +56,7 @@ const RealStateCRUD = () => {
       toast.error("Hubo un error al obtener las propiedades");
     }
   };
+
   useEffect(() => {
     data();
   }, []);

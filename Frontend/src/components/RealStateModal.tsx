@@ -37,16 +37,15 @@ const RealStateFormModal = ({
     email: "",
     price: "",
     status: "",
-    wc: "",
-    dimension: "",
-    parking: "",
-    rooms: "",
-    gardens: "",
+    wc: "0",
+    dimension: "0",
+    parking: "0",
+    rooms: "0",
+    gardens: "0",
   });
   const [images, setImages] = useState<File[]>([]);
   const [previews, setPreviews] = useState<string[]>([]);
   const defaultRef = useRef<HTMLDialogElement>(null);
-
   useEffect(() => {
     if (edit) {
       setFormData({
@@ -63,7 +62,10 @@ const RealStateFormModal = ({
         rooms: formState?.amenitie.rooms || "0",
         gardens: formState?.amenitie.gardens || "0",
       });
+      // Inicializar previews con las URLs de imágenes existentes en el modo editar
+      setPreviews(formState?.images || []);
     } else {
+      // Limpiar el formulario y las imágenes al agregar una nueva propiedad
       setFormData({
         name: "",
         description: "",
@@ -162,7 +164,7 @@ const RealStateFormModal = ({
 
           const urlImgEdit = `${
             import.meta.env.VITE_BACKEND_URL
-          }/realstates/img/${formState.id}`;
+          }/realstates/img/${formState.images.id}`;
           const responseImgEdit = await axios.patch(urlImgEdit, imgData);
           toast.success(responseImgEdit.data.message);
         }
@@ -221,7 +223,7 @@ const RealStateFormModal = ({
     slidesToShow: 1,
     slidesToScroll: 1,
   };
-
+  console.log(JSON.stringify(previews));
   return (
     <dialog
       id="my_modal_1"
