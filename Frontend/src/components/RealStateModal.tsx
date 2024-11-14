@@ -57,11 +57,11 @@ const RealStateFormModal = ({
         email: formState?.email || "",
         price: formState?.price || "",
         status: formState?.status || "",
-        wc: formState?.amenitie.wc || "",
-        dimension: formState?.amenitie.dimension || "",
-        parking: formState?.amenitie.parking || "",
-        rooms: formState?.amenitie.rooms || "",
-        gardens: formState?.amenitie.gardens || "",
+        wc: formState?.amenitie.wc || "0",
+        dimension: formState?.amenitie.dimension || "0",
+        parking: formState?.amenitie.parking || "0",
+        rooms: formState?.amenitie.rooms || "0",
+        gardens: formState?.amenitie.gardens || "0",
       });
     } else {
       setFormData({
@@ -72,11 +72,11 @@ const RealStateFormModal = ({
         email: "",
         price: "",
         status: "",
-        wc: "",
-        dimension: "",
-        parking: "",
-        rooms: "",
-        gardens: "",
+        wc: "0",
+        dimension: "0",
+        parking: "0",
+        rooms: "0",
+        gardens: "0",
       });
       setImages([]);
       setPreviews([]);
@@ -239,7 +239,7 @@ const RealStateFormModal = ({
             <FaWindowClose className="text-4xl text-red-500 hover:text-red-600" />
           </button>
           <h2 className="text-2xl font-bold mb-4">
-           {edit ?  "Edita" : "Agrega"} los datos de tu propiedad
+            {edit ? "Edita" : "Agrega"} los datos de tu propiedad
           </h2>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -316,7 +316,6 @@ const RealStateFormModal = ({
               accept="image/*"
               className="file-input w-full bg-white"
               onChange={handleFileChange}
-              required
             />
             {previews.length > 0 && (
               <Slider {...settings} className="mt-4 w-2/3 md:w-1/2 mx-auto">

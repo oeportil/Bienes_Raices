@@ -8,7 +8,7 @@ type CarouselOfEstatesProps = {
 export default function CarouselOfEstates({ estates }: CarouselOfEstatesProps) {
   const settings = {
     dots: true,
-    infinite: true,
+    infinite: false,
     slidesToShow: 2,
     slidesToScroll: 1,
     autoplay: true,

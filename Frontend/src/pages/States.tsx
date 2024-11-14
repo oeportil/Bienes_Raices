@@ -4,6 +4,7 @@ import { toast } from "react-toastify";
 import axios from "axios";
 import CarouselOfEstates from "../components/EstatesComponents/CarouselOfEstates";
 import EstateCard from "../components/EstatesComponents/EstateCard"; // Asegúrate de importar EstateCard
+import { DiVim } from "react-icons/di";
 
 export default function States() {
   const [estates, setEstates] = useState<RealState[]>([]);
@@ -61,7 +62,15 @@ export default function States() {
         <h2 className="text-4xl font-bold text-center">
           Publicadas recientemente
         </h2>
-        <CarouselOfEstates estates={estates.slice(-5)} />
+        {estates.length >= 5 ? (
+          <CarouselOfEstates estates={estates.slice(-5)} />
+        ) : (
+          <div className="flex justify-evenly">
+            {estates.map((estate) => (
+              <EstateCard key={estate.id} data={estate} />
+            ))}
+          </div>
+        )}
       </section>
 
       {/* Filtro de propiedades */}
@@ -82,9 +91,15 @@ export default function States() {
 
       {/* Mapeo de propiedades */}
       <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-        {filteredEstates.map((estate) => (
-          <EstateCard key={estate.id} data={estate} />
-        ))}
+        {filteredEstates.length > 0 ? (
+          filteredEstates.map((estate) => (
+            <EstateCard key={estate.id} data={estate} />
+          ))
+        ) : (
+          <p className="text-center text-primary text-2xl col-span-3 my-5">
+            No hay propiedades con ese filtro :(
+          </p>
+        )}
       </section>
     </main>
   );
