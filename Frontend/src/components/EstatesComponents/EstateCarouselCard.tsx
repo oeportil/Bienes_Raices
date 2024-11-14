@@ -8,7 +8,7 @@ type EstateCarouselCard = {
 export default function EstateCarouselCard({ data }: EstateCarouselCard) {
   const ActualPath = location.pathname;
 
-  const { name, description, images } = data;
+  const { name, description, images, id } = data;
 
   // Límite de caracteres para la descripción
   const DESCRIPTION_LIMIT = 120;
@@ -24,7 +24,7 @@ export default function EstateCarouselCard({ data }: EstateCarouselCard) {
         <h2 className="text-2xl font-bold">{name}</h2>
         <p className="text-lg mb-2"> {shortDescription}</p>
         <Link
-          to={`#`}
+          to={`/propiedades/${id}`}
           className="bg-secondary hover:bg-green-500 p-2 text-white rounded-sm"
         >
           Ver más

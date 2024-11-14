@@ -61,7 +61,7 @@ export default function EstateCard({ data, actFunction, setEdit, setFormDataedi,
           </p>
         </div>
         <Link
-          to="#"
+          to={`/propiedades/${id}`}
           className="bg-secondary hover:bg-green-500 p-2 text-white rounded-sm w-full text-center"
         >
           Ver más

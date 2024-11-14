@@ -10,6 +10,7 @@ import CRUDState from "./pages/User/CRUDState";
 import MyAuctions from "./pages/User/MyAuctions";
 import Auctions from "./pages/User/Auctions";
 import Subasta from "./pages/User/Subasta";
+import SingleState from "./pages/SingleState";
 
 const router = createBrowserRouter([
   {
@@ -24,6 +25,10 @@ const router = createBrowserRouter([
       {
         path: "propiedades",
         element: <States />,
+      },
+      {
+        path: "propiedades/:id",
+        element: <SingleState/>
       },
       {
         path: "inicio-sesion",
