@@ -272,11 +272,25 @@ class RealStateController {
 
     const realState = await prisma.realState.findUnique({
       where: { id: parsedId },
-      include: { amenitie: true, images: true },
+      include: {
+        amenitie: true,
+        images: true,
+        auction: {
+          include: {
+            bids: {
+              include: {
+                user: { select: { id: true, name: true, email: true } },
+              },
+              orderBy: { amount: "desc" },
+            },
+          },
+        },
+      },
     });
     if (!realState) {
       return res.status(404).json({ message: "Propiedad Inexistente" });
     }
+
     return res.json(realState);
   }
 
