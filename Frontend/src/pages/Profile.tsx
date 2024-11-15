@@ -13,7 +13,6 @@ export default function Profile() {
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
 
   useEffect(() => {
-    // Si los datos del usuario cambian en el store, actualiza los estados locales
     setName(user?.name || "");
     setEmail(user?.email || "");
   }, [user]);
@@ -22,10 +21,7 @@ export default function Profile() {
     try {
       const response = await axios.patch(
         `${import.meta.env.VITE_BACKEND_URL}/users/${user.id}`,
-        {
-          name,
-          email,
-        }
+        { name, email }
       );
       setUser(response.data.user);
       toast.success("Datos actualizados con éxito");
@@ -38,7 +34,7 @@ export default function Profile() {
 
   const handleChangePassword = async () => {
     try {
-      const response = await axios.patch(
+      await axios.patch(
         `${import.meta.env.VITE_BACKEND_URL}/users/${user.id}`,
         { password }
       );
@@ -51,9 +47,11 @@ export default function Profile() {
   };
 
   return (
-    <section className="bg-primary text-white py-16 px-6 md:px-12 mx-96 rounded-xl my-20">
-      <div className="container mx-auto max-w-lg">
-        <h2 className="text-2xl font-bold mb-6">Perfil de Usuario</h2>
+    <section className="bg-primary text-white py-8 px-4 md:px-6 lg:px-12 rounded-xl my-10 mx-auto max-w-full md:max-w-xl lg:max-w-3xl">
+      <div className="container mx-auto">
+        <h2 className="text-2xl font-bold mb-6 text-center md:text-left">
+          Perfil de Usuario
+        </h2>
 
         {/* Formulario de actualización */}
         <div className="mb-4">
@@ -86,7 +84,6 @@ export default function Profile() {
           Actualizar Datos
         </button>
 
-        {/* Botón para abrir el modal de cambio de contraseña */}
         <button
           onClick={() => setIsPasswordModalOpen(true)}
           className="w-full mt-4 bg-accent hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded"
@@ -97,8 +94,10 @@ export default function Profile() {
         {/* Modal de cambio de contraseña */}
         {isPasswordModalOpen && (
           <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-            <div className="bg-primary text-white rounded-lg p-6 w-96">
-              <h3 className="text-lg font-semibold mb-4">Cambiar Contraseña</h3>
+            <div className="bg-primary text-white rounded-lg p-6 w-11/12 max-w-md">
+              <h3 className="text-lg font-semibold mb-4 text-center">
+                Cambiar Contraseña
+              </h3>
               <input
                 type="password"
                 value={password}

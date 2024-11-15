@@ -2,6 +2,7 @@ import { FaEdit, FaTrashAlt, FaCalendarPlus } from "react-icons/fa";
 import { useState, useEffect } from "react";
 import { differenceInDays, isBefore } from "date-fns";
 import { Link } from "react-router-dom";
+import useUserStore from "../../Store/UserStore";
 
 interface MACard {
   user_id: number;
@@ -18,6 +19,7 @@ interface MACard {
 export default function MyAuctionCard(data: any) {
   const [isEditable, setIsEditable] = useState(true);
   const [auctionStarted, setAuctionStarted] = useState(false);
+  const user = useUserStore((state: any) => state.user);
 
   useEffect(() => {
     const now = new Date();
@@ -30,30 +32,31 @@ export default function MyAuctionCard(data: any) {
     setIsEditable(daysDifference > 3);
     setAuctionStarted(isBefore(startDate, now));
   }, [data.startDate]);
-  
-  console.log(data)
+
+  console.log(data);
   return (
     <div className="text-primary w-5/6 mx-auto  border bg-white border-gray-300 rounded-lg shadow-xl p-3">
-      <img  src={`${import.meta.env.VITE_BACKEND_URL}/realstates/img/${
-            data.realState.images[0].id
-          }`} alt="Imagen" />
+      <img
+        src={`${import.meta.env.VITE_BACKEND_URL}/realstates/img/${
+          data.realState.images[0].id
+        }`}
+        alt="Imagen"
+      />
       <h2 className="text-2xl">{data.realState.name}</h2>
       <div className="text-slate-400">
         <h3 className="text-sm ">
           {data.realState.description.substring(0, 250)}
         </h3>
         <p>Precio inicial: ${data.startingPrice}</p>
-        <p>
-          Fecha de inicio:{" "}
-          {new Date(data.startDate).toLocaleDateString()}
-        </p>
-        <p>
-          Fecha de fin: {new Date(data.endDate).toLocaleDateString()}
-        </p>
+        <p>Fecha de inicio: {new Date(data.startDate).toLocaleDateString()}</p>
+        <p>Fecha de fin: {new Date(data.endDate).toLocaleDateString()}</p>
       </div>
       <div className="flex justify-end mx-3 gap-5 text-white">
         {auctionStarted && (
-          <Link to={`${data.id}`} className="flex gap-4 bg-blue-500 hover:bg-blue-600 rounded p-2 m-2">
+          <Link
+            to={user ? `${data.id}` : "/inicio-sesion"}
+            className="flex gap-4 bg-blue-500 hover:bg-blue-600 rounded p-2 m-2"
+          >
             Subasta Activa <FaCalendarPlus />
           </Link>
         )}
