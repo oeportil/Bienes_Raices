@@ -157,22 +157,55 @@ const NavBar: React.FC = () => {
         >
           Subastas
         </Link>
+
         {user ? (
-          <div>
-            <Link
-              to="/perfil"
-              className={`${linkClass(
-                "/perfil"
-              )} block text-center py-2 text-neutral hover:bg-secondary`}
-            >
-              Perfil
-            </Link>
-            <button
-              onClick={handleLogout}
-              className="block text-center w-full text-red-500 hover:bg-red-500 hover:text-white py-2 rounded transition duration-200"
-            >
-              Cerrar Sesión
-            </button>
+          <div className="w-full flex justify-center">
+            <details className="dropdown dropdown-end ">
+              <summary
+                role="button"
+                className="btn m-1 bg-white text-secondary hover:bg-yellow-500 hover:text-white "
+              >
+                Perfil
+              </summary>
+              <ul className="menu dropdown-content bg-white text-primary rounded-box z-[10] w-52 p-2 shadow">
+                <li>
+                  <Link
+                    to="/perfil"
+                    className={`${linkClass("/perfil")} px-3 py-2 rounded`}
+                  >
+                    Mis datos
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    to="/perfil/mis-propiedades"
+                    className={`${linkClass(
+                      "/perfil/mis-propiedades"
+                    )} px-3 py-2 rounded`}
+                  >
+                    Mis propiedades
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    to="/perfil/mis-subastas"
+                    className={`${linkClass(
+                      "/perfil/mis-subastas"
+                    )} px-3 py-2 rounded`}
+                  >
+                    Mis Subastas
+                  </Link>
+                </li>
+                <li>
+                  <button
+                    onClick={handleLogout}
+                    className="bg-white text-primary px-3 py-2 rounded hover:bg-red-500 hover:text-white transition duration-200"
+                  >
+                    Cerrar Sesión
+                  </button>
+                </li>
+              </ul>
+            </details>
           </div>
         ) : (
           <>
