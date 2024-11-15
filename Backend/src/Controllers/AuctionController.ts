@@ -295,7 +295,7 @@ class AuctionController {
       const auction = await prisma.auction.findUnique({
         where: { id: parseInt(id) },
         include: {
-          realState: true,
+          realState: { include: { images: true, amenitie: true } },
           bids: {
             include: {
               user: { select: { id: true, name: true, email: true } },
@@ -340,7 +340,7 @@ class AuctionController {
     try {
       // Obtener las pujas de la subasta, ordenadas de mayor a menor
       const bids = await prisma.bid.findMany({
-        where: { id: parseInt(id) },
+        where: { auction: { id: parseInt(id) } },
         include: {
           user: { select: { id: true, name: true, email: true } },
         },

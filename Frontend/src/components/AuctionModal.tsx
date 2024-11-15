@@ -95,7 +95,10 @@ const AuctionModal = ({
 
     // Validación de fechas
     const now = new Date();
-    if (isBefore(startDateTime, now) || isBefore(endDateTime, now)) {
+    if (
+      isBefore(startDateTime, addHours(now, -6)) ||
+      isBefore(endDateTime, addHours(now, -6))
+    ) {
       toast.error("Las fechas no pueden ser en el pasado.");
       return;
     }
@@ -142,7 +145,7 @@ const AuctionModal = ({
     // Combina fecha y hora de inicio
     const startDateTime = utcToZonedTime(
       set(parseISO(startDate), {
-        hours: parseInt(startTime.split(":")[0]),
+        hours: parseInt(startTime.split(":")[0]) - 6,
         minutes: parseInt(startTime.split(":")[1]),
         seconds: 0,
       }),
@@ -152,7 +155,7 @@ const AuctionModal = ({
     // Combina fecha y hora de fin
     const endDateTime = utcToZonedTime(
       set(parseISO(endDate), {
-        hours: parseInt(endTime.split(":")[0]),
+        hours: parseInt(endTime.split(":")[0]) - 6,
         minutes: parseInt(endTime.split(":")[1]),
         seconds: 0,
       }),
