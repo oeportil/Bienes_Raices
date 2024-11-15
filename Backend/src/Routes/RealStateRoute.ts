@@ -14,7 +14,7 @@ const storage = multer.diskStorage({
 
 const fileFilter = (req, file, cb) => {
   // Filtrar solo imágenes
-  if (file.mimetype.startsWith("image/")) {
+  if (true) {
     cb(null, true);
   } else {
     cb(
@@ -52,7 +52,11 @@ router.get("/list/:id", RealStateController.ListMyStates);
 router.get("/:id", RealStateController.GetRealState);
 router.get("/img/:id", RealStateController.ShowImage);
 router.patch("/:id", RealStateController.EditStates);
-router.patch("/img/:id", RealStateController.EditOnlyImages);
+router.patch(
+  "/img/:id",
+  upload.array("images", 5),
+  RealStateController.EditOnlyImages
+);
 router.delete("/:id", RealStateController.DeleteRealState);
 router.delete("/img/:id", RealStateController.DeleteSingleImage);
 router.delete("/img/all/:id", RealStateController.DeleteAllImages);

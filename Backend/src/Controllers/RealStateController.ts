@@ -113,7 +113,7 @@ class RealStateController {
     }
 
     const files = req.files as Express.Multer.File[];
-
+    console.log(files);
     try {
       const realstate = await prisma.realState.findUnique({
         where: { id: parsedId },
@@ -250,7 +250,6 @@ class RealStateController {
           data: { ...amenitie },
         });
       });
-
       return res
         .status(200)
         .json({ message: "Propiedad Actualizada con Éxito" });

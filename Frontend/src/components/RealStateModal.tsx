@@ -61,11 +61,14 @@ const RealStateFormModal = ({
               `${import.meta.env.VITE_BACKEND_URL}/realstates/img/${image.id}`,
               { responseType: "blob" }
             );
-            return URL.createObjectURL(response.data); // Asegúrate de que la respuesta contenga el URL de la imagen
+            return response.data;
           });
 
-          // Espera a que todas las promesas se resuelvan y luego establece el estado con los resultados
-          const previewUrls = await Promise.all(previewPromises);
+          const previewBlobs = await Promise.all(previewPromises);
+          setImages(previewBlobs);
+          const previewUrls = previewBlobs.map((file) =>
+            URL.createObjectURL(file)
+          );
           setPreviews(previewUrls);
         } catch (error) {
           console.error("Error al cargar las imágenes:", error);
@@ -183,16 +186,21 @@ const RealStateFormModal = ({
         toast.success(responseEdit.data.message);
 
         // Editar imágenes solo si hay nuevas
-        if (images.length > 0) {
-          const imgData = new FormData();
-          images.forEach((image) => imgData.append("images", image));
 
-          const urlImgEdit = `${
-            import.meta.env.VITE_BACKEND_URL
-          }/realstates/img/${formState.images.id}`;
-          const responseImgEdit = await axios.patch(urlImgEdit, imgData);
-          toast.success(responseImgEdit.data.message);
-        }
+        console.log(images);
+        const imgData = new FormData();
+        images.forEach((image) => {
+          imgData.append("images", image);
+        });
+
+        console.log(imgData.getAll("images"));
+        const urlImgEdit = `${
+          import.meta.env.VITE_BACKEND_URL
+        }/realstates/img/${formState.id}`;
+        const responseImgEdit = await axios.patch(urlImgEdit, imgData, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
+        toast.success(responseImgEdit.data.message);
       } else {
         // Crear nueva propiedad
         const dataToSend = new FormData();
@@ -248,7 +256,6 @@ const RealStateFormModal = ({
     slidesToShow: 1,
     slidesToScroll: 1,
   };
-  console.log(previews[0]);
   return (
     <dialog
       id="my_modal_1"
@@ -353,6 +360,7 @@ const RealStateFormModal = ({
                       alt={`Preview ${index}`}
                       className="w-auto h-96"
                     />
+
                     <button
                       type="button"
                       onClick={() => handleRemoveImage(index)}
